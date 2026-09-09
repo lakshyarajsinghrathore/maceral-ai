@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+backend/venv/
+backend/coal_intelligence.db
+coal_intelligence.db
+*.db
+*.sqlite
+
+# Environment & Secrets
+.env
+.env.local
+backend/.env
+frontend/.env
+
+# Node / Frontend
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+
+# Uploads and temporary generated files
+backend/uploads/*.pdf
+backend/uploads/*.docx
+backend/generated_reports/*.pdf
+backend/generated_reports/*.docx
+uploads/
+generated_reports/
+
+# OS / System
+.vscode/
+.idea/
+.DS_Store
+Desktop.lnk
+.claude/

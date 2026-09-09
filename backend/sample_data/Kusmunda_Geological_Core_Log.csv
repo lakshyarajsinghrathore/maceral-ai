@@ -1,0 +1,5 @@
+Borehole_ID,Seam_Name,Depth_From_m,Depth_To_m,Thickness_m,Coal_Grade,GCV_kcal_kg,Ash_Pct,Moisture_Pct,Volatile_Matter_Pct,Sulphur_Pct
+BH-KUS-101,Upper Kusmunda,45.2,74.8,29.6,G11,3820,38.4,9.2,23.1,0.41
+BH-KUS-102,Lower Kusmunda,112.0,131.5,19.5,G10,4110,35.2,8.8,24.5,0.45
+BH-KUS-103,Bottom Seam,180.4,196.2,15.8,G9,4380,32.8,7.9,25.8,0.38
+BH-KUS-104,Upper Kusmunda,50.1,78.9,28.8,G11,3860,38.1,9.0,23.6,0.40

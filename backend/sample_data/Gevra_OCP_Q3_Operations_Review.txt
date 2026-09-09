@@ -1,0 +1,17 @@
+GOVERNMENT OF INDIA • MINISTRY OF COAL
+SOUTH EASTERN COALFIELDS LIMITED (SECL)
+GEVRA EXPANSION OPENCAST PROJECT — STATUTORY COMPLIANCE & OPERATIONS REVIEW
+Reporting Period: Q3 FY 2024-25 (October - December 2024)
+Mine Code: SECL-GEV-01 | Region: Korba Coalfield, Chhattisgarh
+
+1. EXECUTIVE OPERATIONAL PERFORMANCE
+During Q3 FY2024-25, Gevra OCP extracted a total gross coal quantity of 14.85 Million Tonnes (MT) against the quarterly prorated target of 15.00 MT, achieving 99.0% target adherence. Total Overburden Removal (OBR) for the quarter stood at 22.40 Million Cubic Meters (MCuM), yielding an operative stripping ratio of 1.51 Cu.M/Tonne. Rail dispatch through the East-West Rail Corridor via merry-go-round (MGR) reached 11.20 MT, while 3.65 MT was evacuated via high-capacity in-pit conveyor and truck-haulage.
+
+2. GEOLOGICAL SEAM QUALITY AUDIT
+Coal extraction was primarily concentrated in Upper Kusmunda Seam (Thickness: 28.5 meters) and Lower Kusmunda Seam (Thickness: 19.2 meters). Laboratory bomb calorimeter analysis certified an average Gross Calorific Value (GCV) of 3,840 kcal/kg, placing the extracted lot under Grade G11 Non-Coking Coal. Average Ash Content is recorded at 38.6%, inherent moisture at 8.9%, volatile matter at 23.4%, and sulphur content at 0.42%.
+
+3. DGMS STATUTORY SAFETY & MINE INTEGRITY
+Safety performance remained exemplary with zero fatal accidents recorded during the quarter. Two minor reportable near-misses occurred in the eastern overburden dump bench during heavy machinery maneuvering, following which DGMS Circular No. 04 slope stabilization guidelines were immediately enacted. Ambient methane (CH4) sensors registered negligible 0.01% concentrations. Continuous telemetry monitoring of high-wall stability with synthetic aperture radar (SAR) confirmed zero slope deformation across all 42 benches.
+
+4. ENVIRONMENTAL & CPCB STATUTORY NORMS
+Ambient air quality monitoring within the 5 km buffer radius yielded an average PM10 concentration of 76.2 µg/m³ (CPCB permissible limit: 100 µg/m³) and PM2.5 concentration of 38.4 µg/m³ (limit: 60 µg/m³). Water discharge effluent treatment plants (ETP) maintained discharge pH at 7.4 with Total Suspended Solids (TSS) at 34 mg/l against the maximum statutory limit of 100 mg/l. Stage-II Forest Clearance compliance remains active across 1,840 hectares.
