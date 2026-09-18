@@ -89,6 +89,11 @@ export const fetchComplianceScores = async () => {
   return response.data;
 };
 
+export const fetchTelemetry = async () => {
+  const response = await api.get('/api/compliance/telemetry');
+  return response.data;
+};
+
 export const fetchAlerts = async (status = null) => {
   const params = status ? { status } : {};
   const response = await api.get('/api/compliance/alerts', { params });

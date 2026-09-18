@@ -48,6 +48,14 @@ class MineBase(BaseModel):
     longitude: float
     mine_type: Optional[str] = "Opencast"
     target_annual_production_mt: Optional[float] = 10.0
+    coal_seam: Optional[str] = None
+    daily_target_kt: Optional[float] = 15.0
+    daily_actual_kt: Optional[float] = 15.0
+    coal_dispatched_kt: Optional[float] = 14.0
+    pithead_temp_c: Optional[float] = 35.0
+    methane_ch4_pct: Optional[float] = 0.25
+    dust_particulate_mg_m3: Optional[float] = 2.0
+    telemetry_status: Optional[str] = "Normal"
 
 class MineCreate(MineBase):
     pass
@@ -189,9 +197,24 @@ class AlertResponse(BaseModel):
     description: str
     suggested_action: Optional[str] = None
     status: str
+    statutory_rule: Optional[str] = None
+    assigned_owner: Optional[str] = None
+    target_resolution_date: Optional[str] = None
     escalated_to: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
     class Config:
         from_attributes = True
+
+
+class TelemetrySummaryResponse(BaseModel):
+    total_sites_count: int
+    daily_production_kt: float
+    daily_target_kt: float
+    production_variance_pct: float
+    coal_dispatched_kt: float
+    watch_critical_sites_count: int
+    open_conditions_count: int
+    operating_sites: List[Dict[str, Any]]
+    active_flags: List[Dict[str, Any]]

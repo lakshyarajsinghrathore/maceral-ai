@@ -206,9 +206,20 @@ export default function Dashboard() {
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-semibold">
                         {m.subsidiary}
                       </span>
-                      <span className={`text-[11px] font-mono px-2 py-0.5 rounded-full border font-bold ${scoreColor}`}>
-                        {score} / 100
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        {m.telemetry_status && (
+                          <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase ${
+                            m.telemetry_status === 'Critical' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
+                            m.telemetry_status === 'Watch' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                            'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                          }`}>
+                            {m.telemetry_status}
+                          </span>
+                        )}
+                        <span className={`text-[11px] font-mono px-2 py-0.5 rounded-full border font-bold ${scoreColor}`}>
+                          {score} / 100
+                        </span>
+                      </div>
                     </div>
 
                     <h4 className="text-sm font-bold text-slate-100 mt-2 truncate">{m.name}</h4>
@@ -216,10 +227,15 @@ export default function Dashboard() {
                       <MapPin className="h-3 w-3 text-amber-500" />
                       {m.region}, {m.state}
                     </p>
+                    {m.coal_seam && (
+                      <p className="text-[11px] text-amber-400/80 font-mono mt-0.5 truncate">
+                        Seam: {m.coal_seam}
+                      </p>
+                    )}
 
                     <div className="mt-2.5 pt-2 border-t border-slate-800 flex justify-between text-[11px] font-mono text-slate-400">
-                      <span>Type: <strong className="text-slate-300">{m.mine_type}</strong></span>
-                      <span>Target: <strong className="text-amber-300">{m.target_annual_production_mt} MT</strong></span>
+                      <span>Daily: <strong className="text-slate-200">{m.daily_actual_kt ?? m.target_annual_production_mt} kT</strong></span>
+                      <span>Target: <strong className="text-amber-300">{m.daily_target_kt ?? m.target_annual_production_mt} kT</strong></span>
                     </div>
                   </div>
                 );
@@ -251,16 +267,34 @@ export default function Dashboard() {
 
               <div className="mt-4 p-3 bg-slate-950/70 border border-slate-800/80 rounded-xl space-y-2 text-xs font-mono">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">GPS Coordinates:</span>
-                  <span className="text-slate-200">{selectedMine.latitude}° N, {selectedMine.longitude}° E</span>
+                  <span className="text-slate-400">Target Coal Seam:</span>
+                  <span className="text-amber-300 font-semibold">{selectedMine.coal_seam || 'General Seam'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Mine Category:</span>
-                  <span className="text-slate-200">{selectedMine.mine_type}</span>
+                  <span className="text-slate-400">Daily Actual / Target:</span>
+                  <span className="text-slate-200 font-semibold">
+                    {selectedMine.daily_actual_kt ?? 15.0} / {selectedMine.daily_target_kt ?? 15.0} kT
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Target Production:</span>
-                  <span className="text-amber-400 font-bold">{selectedMine.target_annual_production_mt} MTPA</span>
+                  <span className="text-slate-400">Coal Dispatched:</span>
+                  <span className="text-emerald-400 font-bold">{selectedMine.coal_dispatched_kt ?? 14.0} kT</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Pithead Strata Temp:</span>
+                  <span className={selectedMine.pithead_temp_c > 40 ? "text-rose-400 font-bold" : "text-slate-200"}>
+                    {selectedMine.pithead_temp_c ?? 35.0}°C
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Methane Gas (CH₄):</span>
+                  <span className={selectedMine.methane_ch4_pct >= 1.0 ? "text-rose-400 font-bold" : selectedMine.methane_ch4_pct >= 0.5 ? "text-amber-400 font-bold" : "text-emerald-400 font-bold"}>
+                    {selectedMine.methane_ch4_pct ?? 0.25}%
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Ambient Particulate Dust:</span>
+                  <span className="text-slate-200">{selectedMine.dust_particulate_mg_m3 ?? 2.0} mg/m³</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Compliance Health:</span>
@@ -269,10 +303,12 @@ export default function Dashboard() {
               </div>
 
               <div className="mt-4 flex items-center justify-between text-xs text-slate-400">
-                <span className="flex items-center gap-1.5 text-emerald-400">
+                <span className="flex items-center gap-1.5 text-emerald-400 font-mono">
                   <CheckCircle className="h-3.5 w-3.5" /> Sensor link active
                 </span>
-                <span className="font-mono text-slate-500">Live Telemetry</span>
+                <span className="font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800 text-[10px]">
+                  Status: {selectedMine.telemetry_status || 'Normal'}
+                </span>
               </div>
             </div>
           )}
@@ -290,7 +326,7 @@ export default function Dashboard() {
             </div>
 
             <div className="space-y-3">
-              {alerts.slice(0, 3).map((a) => (
+              {alerts.slice(0, 4).map((a) => (
                 <div
                   key={a.id}
                   className="p-3 bg-slate-900/90 border border-slate-800/80 rounded-xl space-y-1.5 hover:border-slate-700 transition-all text-xs"
@@ -303,8 +339,10 @@ export default function Dashboard() {
                   </div>
                   <p className="text-slate-400 text-[11px] leading-relaxed">{a.description}</p>
                   <div className="pt-1.5 border-t border-slate-800/60 flex items-center justify-between text-[10px] text-slate-500 font-mono">
-                    <span>Mine: {a.mine_name || 'Moonidih'}</span>
-                    <span className="text-amber-400">Action Suggested</span>
+                    <span className="truncate max-w-[140px] text-slate-400">
+                      {a.statutory_rule ? a.statutory_rule.split('(')[0] : (a.mine_name || 'CMR 2017')}
+                    </span>
+                    <span className="text-amber-400 font-semibold">{a.assigned_owner || 'Action Suggested'}</span>
                   </div>
                 </div>
               ))}

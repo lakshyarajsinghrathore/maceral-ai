@@ -165,11 +165,30 @@ export default function ComplianceOverview() {
                       </span>
                     </div>
 
+                    {alert.statutory_rule && (
+                      <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono">
+                        <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30 font-semibold">
+                          📜 {alert.statutory_rule}
+                        </span>
+                        {alert.target_resolution_date && (
+                          <span className="text-slate-400">
+                            Due: <strong className="text-rose-400">{alert.target_resolution_date}</strong>
+                          </span>
+                        )}
+                      </div>
+                    )}
+
                     <p className="text-slate-300 text-[11px] leading-relaxed font-sans">{alert.description}</p>
 
                     {alert.suggested_action && (
                       <div className="p-2 bg-slate-950/80 rounded-lg border border-slate-800 text-[11px] text-amber-300 font-mono">
                         💡 <strong>Suggested Directive:</strong> {alert.suggested_action}
+                      </div>
+                    )}
+
+                    {alert.assigned_owner && (
+                      <div className="text-[10px] font-mono text-slate-400">
+                        Assigned Owner: <strong className="text-slate-200">{alert.assigned_owner}</strong>
                       </div>
                     )}
 

@@ -7,88 +7,202 @@ from app.services.auth_service import hash_password
 
 MINES_SEED = [
     {
-        "id": "m1-gevra-secl",
-        "name": "Gevra Opencast Mine",
-        "code": "SECL-GEV-01",
-        "subsidiary": "SECL",
-        "region": "Korba Coalfield",
-        "state": "Chhattisgarh",
-        "latitude": 22.3484,
-        "longitude": 82.5939,
+        "id": "m-singrauli-north",
+        "name": "Singrauli North",
+        "code": "NCL-SNG-01",
+        "subsidiary": "NCL",
+        "region": "Sonbhadra",
+        "state": "Uttar Pradesh",
+        "latitude": 24.1982,
+        "longitude": 82.6712,
         "mine_type": "Opencast",
-        "target_annual_production_mt": 52.5,
-        "score": 91.2,
-        "risk": "Low"
+        "target_annual_production_mt": 28.5,
+        "coal_seam": "Purewa Bottom",
+        "daily_target_kt": 28.5,
+        "daily_actual_kt": 23.1,
+        "coal_dispatched_kt": 19.2,
+        "pithead_temp_c": 38.4,
+        "methane_ch4_pct": 1.42,
+        "dust_particulate_mg_m3": 4.1,
+        "telemetry_status": "Critical",
+        "score": 68.0,
+        "risk": "Critical"
     },
     {
-        "id": "m2-kusmunda-secl",
-        "name": "Kusmunda Opencast Project",
-        "code": "SECL-KUS-02",
+        "id": "m-jharia-ug",
+        "name": "Jharia Underground",
+        "code": "BCCL-JHA-02",
+        "subsidiary": "BCCL",
+        "region": "Dhanbad",
+        "state": "Jharkhand",
+        "latitude": 23.7436,
+        "longitude": 86.4125,
+        "mine_type": "Underground",
+        "target_annual_production_mt": 16.0,
+        "coal_seam": "Seam X Coking",
+        "daily_target_kt": 16.0,
+        "daily_actual_kt": 15.2,
+        "coal_dispatched_kt": 14.0,
+        "pithead_temp_c": 37.8,
+        "methane_ch4_pct": 0.85,
+        "dust_particulate_mg_m3": 2.8,
+        "telemetry_status": "Watch",
+        "score": 76.0,
+        "risk": "Watch"
+    },
+    {
+        "id": "m-korba-central",
+        "name": "Korba Central",
+        "code": "SECL-KOR-03",
         "subsidiary": "SECL",
-        "region": "Korba Coalfield",
+        "region": "Korba",
         "state": "Chhattisgarh",
         "latitude": 22.3276,
         "longitude": 82.6975,
         "mine_type": "Opencast",
-        "target_annual_production_mt": 50.0,
-        "score": 86.4,
-        "risk": "Low"
+        "target_annual_production_mt": 42.0,
+        "coal_seam": "Upper Kusmunda",
+        "daily_target_kt": 42.0,
+        "daily_actual_kt": 36.4,
+        "coal_dispatched_kt": 32.0,
+        "pithead_temp_c": 36.5,
+        "methane_ch4_pct": 0.44,
+        "dust_particulate_mg_m3": 2.1,
+        "telemetry_status": "Watch",
+        "score": 84.0,
+        "risk": "Watch"
     },
     {
-        "id": "m3-moonidih-bccl",
-        "name": "Moonidih Deep Underground Mine",
-        "code": "BCCL-MOO-03",
-        "subsidiary": "BCCL",
-        "region": "Jharia Coalfield",
-        "state": "Jharkhand",
-        "latitude": 23.7386,
-        "longitude": 86.3533,
-        "mine_type": "Underground",
-        "target_annual_production_mt": 4.2,
-        "score": 74.5,
-        "risk": "Moderate"
-    },
-    {
-        "id": "m4-rajmahal-ecl",
-        "name": "Rajmahal Opencast Mine",
-        "code": "ECL-RAJ-04",
-        "subsidiary": "ECL",
-        "region": "Rajmahal Coalfield",
-        "state": "Jharkhand",
-        "latitude": 25.0450,
-        "longitude": 87.3780,
-        "mine_type": "Opencast",
-        "target_annual_production_mt": 21.0,
-        "score": 68.0,
-        "risk": "Moderate"
-    },
-    {
-        "id": "m5-jayant-ncl",
-        "name": "Jayant Opencast Project",
-        "code": "NCL-JAY-05",
-        "subsidiary": "NCL",
-        "region": "Singrauli Coalfield",
-        "state": "Madhya Pradesh",
-        "latitude": 24.1202,
-        "longitude": 82.6450,
-        "mine_type": "Opencast",
-        "target_annual_production_mt": 25.0,
-        "score": 94.0,
-        "risk": "Low"
-    },
-    {
-        "id": "m6-bhubaneswari-mcl",
-        "name": "Bhubaneswari Coal Mine",
-        "code": "MCL-BHU-06",
+        "id": "m-talcher-east",
+        "name": "Talcher East",
+        "code": "MCL-TAL-04",
         "subsidiary": "MCL",
-        "region": "Talcher Coalfield",
+        "region": "Angul",
         "state": "Odisha",
         "latitude": 20.9500,
         "longitude": 85.1200,
         "mine_type": "Opencast",
-        "target_annual_production_mt": 30.0,
-        "score": 82.8,
-        "risk": "Low"
+        "target_annual_production_mt": 34.0,
+        "coal_seam": "Seam VIII",
+        "daily_target_kt": 34.0,
+        "daily_actual_kt": 31.8,
+        "coal_dispatched_kt": 27.5,
+        "pithead_temp_c": 41.2,
+        "methane_ch4_pct": 0.68,
+        "dust_particulate_mg_m3": 3.4,
+        "telemetry_status": "Watch",
+        "score": 79.0,
+        "risk": "Watch"
+    },
+    {
+        "id": "m-ib-valley",
+        "name": "Ib Valley OCP",
+        "code": "MCL-IBV-05",
+        "subsidiary": "MCL",
+        "region": "Jharsuguda",
+        "state": "Odisha",
+        "latitude": 21.8250,
+        "longitude": 83.9210,
+        "mine_type": "Opencast",
+        "target_annual_production_mt": 15.0,
+        "coal_seam": "Lajkura Seam",
+        "daily_target_kt": 15.0,
+        "daily_actual_kt": 15.4,
+        "coal_dispatched_kt": 14.2,
+        "pithead_temp_c": 35.5,
+        "methane_ch4_pct": 0.35,
+        "dust_particulate_mg_m3": 2.0,
+        "telemetry_status": "Normal",
+        "score": 91.0,
+        "risk": "Normal"
+    },
+    {
+        "id": "m-jharkhand-pit",
+        "name": "Jharkhand Pit (Rajmahal)",
+        "code": "ECL-JHK-06",
+        "subsidiary": "ECL",
+        "region": "Rajmahal",
+        "state": "Jharkhand",
+        "latitude": 25.0450,
+        "longitude": 87.3780,
+        "mine_type": "Opencast",
+        "target_annual_production_mt": 3.0,
+        "coal_seam": "Rajmahal Seam II",
+        "daily_target_kt": 3.0,
+        "daily_actual_kt": 3.0,
+        "coal_dispatched_kt": 2.0,
+        "pithead_temp_c": 35.0,
+        "methane_ch4_pct": 0.30,
+        "dust_particulate_mg_m3": 1.7,
+        "telemetry_status": "Normal",
+        "score": 80.0,
+        "risk": "Normal"
+    },
+    {
+        "id": "m-north-karanpura",
+        "name": "North Karanpura",
+        "code": "CCL-NKP-07",
+        "subsidiary": "CCL",
+        "region": "Chatra",
+        "state": "Jharkhand",
+        "latitude": 23.8560,
+        "longitude": 85.0320,
+        "mine_type": "Mixed",
+        "target_annual_production_mt": 20.0,
+        "coal_seam": "Dakra Incline",
+        "daily_target_kt": 20.0,
+        "daily_actual_kt": 21.2,
+        "coal_dispatched_kt": 18.4,
+        "pithead_temp_c": 33.8,
+        "methane_ch4_pct": 0.22,
+        "dust_particulate_mg_m3": 1.6,
+        "telemetry_status": "Normal",
+        "score": 94.0,
+        "risk": "Normal"
+    },
+    {
+        "id": "m-raniganj-deep",
+        "name": "Raniganj Deep",
+        "code": "ECL-RAN-08",
+        "subsidiary": "ECL",
+        "region": "Asansol",
+        "state": "West Bengal",
+        "latitude": 23.6820,
+        "longitude": 86.9850,
+        "mine_type": "Underground",
+        "target_annual_production_mt": 14.5,
+        "coal_seam": "Dishergarh",
+        "daily_target_kt": 14.5,
+        "daily_actual_kt": 14.9,
+        "coal_dispatched_kt": 13.8,
+        "pithead_temp_c": 34.1,
+        "methane_ch4_pct": 0.32,
+        "dust_particulate_mg_m3": 1.8,
+        "telemetry_status": "Normal",
+        "score": 92.0,
+        "risk": "Normal"
+    },
+    {
+        "id": "m-wardha-valley",
+        "name": "Wardha Valley",
+        "code": "WCL-WAR-09",
+        "subsidiary": "WCL",
+        "region": "Chandrapur",
+        "state": "Maharashtra",
+        "latitude": 19.9610,
+        "longitude": 79.2960,
+        "mine_type": "Opencast",
+        "target_annual_production_mt": 18.0,
+        "coal_seam": "Ballarpur Bottom",
+        "daily_target_kt": 18.0,
+        "daily_actual_kt": 17.4,
+        "coal_dispatched_kt": 15.1,
+        "pithead_temp_c": 35.0,
+        "methane_ch4_pct": 0.28,
+        "dust_particulate_mg_m3": 1.9,
+        "telemetry_status": "Normal",
+        "score": 89.0,
+        "risk": "Normal"
     }
 ]
 
@@ -324,11 +438,11 @@ def seed_database(db: Session):
         db.commit()
         print(" Seeded default administrator account: admin@coal.gov.in / Admin@12345")
 
-    existing_mines = db.query(Mine).count()
-    if existing_mines == 0:
-        print("Seeding Indian Coal Mines and realistic dataset...")
-        # 1. Seed Mines & Compliance Scores
-        for m in MINES_SEED:
+    print("Upserting 9 Indian Coal Mines and real-world telemetry dataset...")
+    # 1. Seed / Update Mines & Compliance Scores
+    for m in MINES_SEED:
+        mine_obj = db.query(Mine).filter((Mine.id == m["id"]) | (Mine.code == m["code"])).first()
+        if not mine_obj:
             mine_obj = Mine(
                 id=m["id"],
                 name=m["name"],
@@ -339,13 +453,40 @@ def seed_database(db: Session):
                 latitude=m["latitude"],
                 longitude=m["longitude"],
                 mine_type=m["mine_type"],
-                target_annual_production_mt=m["target_annual_production_mt"]
+                target_annual_production_mt=m["target_annual_production_mt"],
+                coal_seam=m.get("coal_seam"),
+                daily_target_kt=m.get("daily_target_kt", 15.0),
+                daily_actual_kt=m.get("daily_actual_kt", 15.0),
+                coal_dispatched_kt=m.get("coal_dispatched_kt", 14.0),
+                pithead_temp_c=m.get("pithead_temp_c", 35.0),
+                methane_ch4_pct=m.get("methane_ch4_pct", 0.25),
+                dust_particulate_mg_m3=m.get("dust_particulate_mg_m3", 2.0),
+                telemetry_status=m.get("telemetry_status", "Normal")
             )
             db.add(mine_obj)
+        else:
+            mine_obj.name = m["name"]
+            mine_obj.subsidiary = m["subsidiary"]
+            mine_obj.region = m["region"]
+            mine_obj.state = m["state"]
+            mine_obj.latitude = m["latitude"]
+            mine_obj.longitude = m["longitude"]
+            mine_obj.mine_type = m["mine_type"]
+            mine_obj.target_annual_production_mt = m["target_annual_production_mt"]
+            mine_obj.coal_seam = m.get("coal_seam")
+            mine_obj.daily_target_kt = m.get("daily_target_kt", 15.0)
+            mine_obj.daily_actual_kt = m.get("daily_actual_kt", 15.0)
+            mine_obj.coal_dispatched_kt = m.get("coal_dispatched_kt", 14.0)
+            mine_obj.pithead_temp_c = m.get("pithead_temp_c", 35.0)
+            mine_obj.methane_ch4_pct = m.get("methane_ch4_pct", 0.25)
+            mine_obj.dust_particulate_mg_m3 = m.get("dust_particulate_mg_m3", 2.0)
+            mine_obj.telemetry_status = m.get("telemetry_status", "Normal")
 
-            # Compliance score
+        # Compliance score
+        score_obj = db.query(ComplianceScore).filter(ComplianceScore.mine_id == mine_obj.id).first()
+        if not score_obj:
             score_obj = ComplianceScore(
-                mine_id=m["id"],
+                mine_id=mine_obj.id,
                 overall_score=m["score"],
                 safety_score=m["score"] + 2.0 if m["score"] < 98 else 98.0,
                 environmental_score=m["score"] - 1.5,
@@ -361,8 +502,11 @@ def seed_database(db: Session):
                 evaluated_period="Latest"
             )
             db.add(score_obj)
+        else:
+            score_obj.overall_score = m["score"]
+            score_obj.risk_level = m["risk"]
 
-        db.commit()
+    db.commit()
 
     # 2. Seed Sample Documents & Extracted Chunks
     if db.query(Document).count() == 0:
@@ -408,38 +552,87 @@ def seed_database(db: Session):
             db.add(ext_obj)
         db.commit()
 
-    # 3. Seed Predictive Alerts
-    if db.query(Alert).count() == 0:
+    # 3. Seed Predictive Alerts with Statutory Ownership
+    if db.query(Alert).count() == 0 or db.query(Alert).filter(Alert.statutory_rule.isnot(None)).count() == 0:
         sample_alerts = [
             {
-                "mine_id": "m3-moonidih-bccl",
+                "mine_id": "m-singrauli-north",
+                "severity": "critical",
+                "category": "safety_breach",
+                "title": "Methane Concentration Statutory Breach (1.42% in Panel 4B)",
+                "description": "Continuous infrared telemetry detected methane concentration remains above statutory threshold in Panel 4B.",
+                "suggested_action": "Immediate electrical isolation of Panel 4B, increase auxiliary airflow, and notify Deputy Director of Mines Safety under CMR 153.",
+                "statutory_rule": "CMR 2017 Reg 153 / Reg 154 (Inflammable Gas Standards)",
+                "assigned_owner": "Ventilation Control Room",
+                "target_resolution_date": "2026-09-14"
+            },
+            {
+                "mine_id": "m-talcher-east",
+                "severity": "medium",
+                "category": "environmental_limit",
+                "title": "Dust Misting Pump Tripped on Haul Road 3",
+                "description": "Misting pump tripped on Haul Road 3 during morning shift resulting in localized particulate dust spike (3.4 mg/m³).",
+                "suggested_action": "Reset pressure valve, deploy standby water bowsers, and verify continuous ambient particulate telemetry.",
+                "statutory_rule": "CMR 2017 Reg 168 (Dust Suppression)",
+                "assigned_owner": "Surface Operations",
+                "target_resolution_date": "2026-09-13"
+            },
+            {
+                "mine_id": "m-korba-central",
+                "severity": "medium",
+                "category": "production_drop",
+                "title": "Dragline Maintenance Reduced Morning Output (13.3% deficit)",
+                "description": "Unscheduled 24/96 walking dragline swing-motor inspection on Bench 4 reduced planned morning overburden stripping capacity.",
+                "suggested_action": "Deploy standby hydraulic shovel fleet to Bench 4 to recover overburden stripping deficit.",
+                "statutory_rule": "CMR 2017 Reg 106 (Bench Stability)",
+                "assigned_owner": "Pit Engineering",
+                "target_resolution_date": "2026-09-14"
+            },
+            {
+                "mine_id": "m-jharia-ug",
                 "severity": "high",
                 "category": "safety_breach",
                 "title": "Methane Peak Concentration (0.78% at Tailgate 2)",
-                "description": "Continuous underground telemetry detected elevated methane buildup at Tailgate 2 seam return.",
-                "suggested_action": "Increase auxiliary intake airflow and complete CMR 133 strata cable bolting."
+                "description": "Peak methane reached 0.78% at Tailgate 2 during high extraction cycle, triggering supervisory watch under DGMS guidelines.",
+                "suggested_action": "Increase auxiliary intake airflow and complete CMR 133 strata cable bolting.",
+                "statutory_rule": "CMR 2017 Reg 153 (Ventilation & Inflammable Gas)",
+                "assigned_owner": "Safety & Ventilation Directorate",
+                "target_resolution_date": "2026-09-13"
             },
             {
-                "mine_id": "m4-rajmahal-ecl",
+                "mine_id": "m-jharkhand-pit",
                 "severity": "medium",
                 "category": "production_drop",
                 "title": "Quarterly OBR Stripping Ratio Deficit (18.4%)",
-                "description": "Heavy monsoon waterlogging in bottom pit delayed excavator deployment for overburden removal.",
-                "suggested_action": "Deploy high-capacity dewatering sump pumps and review contractor truck deployment."
+                "description": "Quarterly Overburden Removal (OBR) stripping ratio fell behind target by 18.4% due to monsoon water accumulation in lower benches.",
+                "suggested_action": "Deploy high-capacity dewatering sump pumps and review contractor truck deployment.",
+                "statutory_rule": "CMR 2017 Reg 106 (Bench Geometry & Slope Stability)",
+                "assigned_owner": "Mine Planning & Geotechnical Directorate",
+                "target_resolution_date": "2026-09-18"
             }
         ]
 
         for a in sample_alerts:
-            alert_obj = Alert(
-                mine_id=a["mine_id"],
-                severity=a["severity"],
-                category=a["category"],
-                title=a["title"],
-                description=a["description"],
-                suggested_action=a["suggested_action"],
-                status="pending"
-            )
-            db.add(alert_obj)
+            # Check if alert with same title already exists
+            existing_a = db.query(Alert).filter(Alert.title == a["title"]).first()
+            if not existing_a:
+                alert_obj = Alert(
+                    mine_id=a["mine_id"],
+                    severity=a["severity"],
+                    category=a["category"],
+                    title=a["title"],
+                    description=a["description"],
+                    suggested_action=a["suggested_action"],
+                    statutory_rule=a.get("statutory_rule"),
+                    assigned_owner=a.get("assigned_owner"),
+                    target_resolution_date=a.get("target_resolution_date"),
+                    status="pending"
+                )
+                db.add(alert_obj)
+            else:
+                existing_a.statutory_rule = a.get("statutory_rule")
+                existing_a.assigned_owner = a.get("assigned_owner")
+                existing_a.target_resolution_date = a.get("target_resolution_date")
 
         db.commit()
 

@@ -39,6 +39,17 @@ class Mine(Base):
     longitude = Column(Float, nullable=False)
     mine_type = Column(String(50), default="Opencast") # Opencast, Underground, Mixed
     target_annual_production_mt = Column(Float, default=10.0)
+
+    # Live Telemetry & Seam Profiling
+    coal_seam = Column(String(100), nullable=True)
+    daily_target_kt = Column(Float, default=15.0)
+    daily_actual_kt = Column(Float, default=15.0)
+    coal_dispatched_kt = Column(Float, default=14.0)
+    pithead_temp_c = Column(Float, default=35.0)
+    methane_ch4_pct = Column(Float, default=0.25)
+    dust_particulate_mg_m3 = Column(Float, default=2.0)
+    telemetry_status = Column(String(50), default="Normal") # Critical, Watch, Normal
+
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -151,6 +162,9 @@ class Alert(Base):
     description = Column(Text, nullable=False)
     suggested_action = Column(Text, nullable=True)
     status = Column(String(50), default="pending") # pending, approved, escalated, resolved
+    statutory_rule = Column(String(100), nullable=True) # e.g. CMR 2017 Reg 153, CMR 168, CMR 106
+    assigned_owner = Column(String(100), nullable=True) # e.g. Ventilation Control Room, Surface Operations
+    target_resolution_date = Column(String(50), nullable=True) # e.g. 2026-09-15
     escalated_to = Column(String(255), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
