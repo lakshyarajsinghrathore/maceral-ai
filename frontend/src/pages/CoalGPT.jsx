@@ -9,7 +9,9 @@ import {
   RotateCcw,
   History,
   Trash2,
-  MessageSquare
+  MessageSquare,
+  Mic,
+  Volume2
 } from 'lucide-react';
 import { askCoalGPT, fetchMines } from '../api/client';
 import CitationBadge from '../components/CitationBadge';
@@ -103,8 +105,51 @@ export default function CoalGPT() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedMine, setSelectedMine] = useState('');
+  const [language, setLanguage] = useState('English');
+  const [isListening, setIsListening] = useState(false);
   const [mines, setMines] = useState([]);
   const messagesEndRef = useRef(null);
+
+  const toggleListening = () => {
+    if (isListening) {
+      if (window._speechRecognition) {
+        window._speechRecognition.stop();
+      }
+      setIsListening(false);
+    } else {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.lang = language === 'Hindi' ? 'hi-IN' : language === 'Bengali' ? 'bn-IN' : 'en-IN';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = () => setIsListening(true);
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          setInput(prev => prev ? prev + ' ' + transcript : transcript);
+        };
+        recognition.onerror = (e) => {
+          console.error("Speech error", e);
+          setIsListening(false);
+        };
+        recognition.onend = () => setIsListening(false);
+
+        window._speechRecognition = recognition;
+        recognition.start();
+      } else {
+        alert("Speech API is not supported in this browser. Please use Chrome/Edge.");
+      }
+    }
+  };
+
+  const playTTS = (text) => {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = language === 'Hindi' ? 'hi-IN' : language === 'Bengali' ? 'bn-IN' : 'en-IN';
+        window.speechSynthesis.speak(utterance);
+    }
+  };
 
   // Persist active session messages and active session ID to localStorage
   useEffect(() => {
@@ -237,7 +282,7 @@ export default function CoalGPT() {
       .map((m) => ({ role: m.role, content: m.content }));
 
     try {
-      const response = await askCoalGPT(q, selectedMine || null, null, historyPayload);
+      const response = await askCoalGPT(q, selectedMine || null, null, historyPayload, language);
       const botMsg = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -416,6 +461,18 @@ export default function CoalGPT() {
             <span>New Chat</span>
           </button>
 
+          {/* Language Filter */}
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className="bg-slate-900 border border-slate-800 text-slate-300 rounded-xl px-2 py-1.5 focus:outline-none focus:border-amber-500 text-xs"
+            title="Select Interface Language"
+          >
+            <option value="English">🇬🇧 English</option>
+            <option value="Hindi">🇮🇳 Hindi (हिन्दी)</option>
+            <option value="Bengali">🇮🇳 Bengali (বাংলা)</option>
+          </select>
+
           {/* Mine Filter */}
           <select
             value={selectedMine}
@@ -470,6 +527,13 @@ export default function CoalGPT() {
                           <img src="/logo.png" alt="CoalGPT" className="h-4 w-auto object-contain" />
                         </div>
                         <span>CoalGPT AI Intelligence</span>
+                        <button
+                          onClick={() => playTTS(m.content)}
+                          className="ml-2 text-slate-500 hover:text-amber-400 transition-colors"
+                          title="Read aloud"
+                        >
+                          <Volume2 className="h-3.5 w-3.5" />
+                        </button>
                       </>
                     )}
                   </span>
@@ -524,11 +588,23 @@ export default function CoalGPT() {
 
       {/* Input Box */}
       <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="flex items-center space-x-3">
+        <button
+          type="button"
+          onClick={toggleListening}
+          className={`p-3 rounded-xl transition-all shadow-sm flex items-center justify-center shrink-0 ${
+            isListening
+              ? 'bg-rose-500/20 text-rose-400 border border-rose-500/50 animate-pulse'
+              : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-amber-400 hover:border-amber-500/50'
+          }`}
+          title="Dictate in regional language"
+        >
+          <Mic className="h-4 w-4" />
+        </button>
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask any parliamentary query, safety record, or production audit (e.g. 'What is Gevra stripping ratio?')..."
+          placeholder={isListening ? "Listening..." : "Ask any parliamentary query, safety record, or report an incident..."}
           disabled={loading}
           className="flex-1 bg-[#10172B] border border-slate-800 rounded-xl px-4 py-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 shadow-sm"
         />

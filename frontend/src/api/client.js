@@ -51,13 +51,14 @@ export const deleteDocument = async (documentId) => {
 };
 
 // CoalGPT Q&A API
-export const askCoalGPT = async (question, mineId = null, docCategory = null, chatHistory = []) => {
+export const askCoalGPT = async (question, mineId = null, docCategory = null, chatHistory = [], language = 'English') => {
   const response = await api.post('/api/qa/ask', {
     question,
     mine_id: mineId,
     doc_category: docCategory,
     include_all_mines: !mineId,
     chat_history: chatHistory,
+    language
   });
   return response.data;
 };

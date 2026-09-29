@@ -126,6 +126,7 @@ class QARequest(BaseModel):
     doc_category: Optional[str] = None
     include_all_mines: Optional[bool] = True
     chat_history: Optional[List[ChatMessage]] = []
+    language: Optional[str] = "English"
 
 class QAResponse(BaseModel):
     question: str

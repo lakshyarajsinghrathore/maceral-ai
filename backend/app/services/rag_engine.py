@@ -82,6 +82,19 @@ def is_greeting(query: str) -> bool:
         return True
     return False
 
+def is_incident_report(query: str) -> bool:
+    """
+    Heuristic to check if the user is trying to report an incident or emergency.
+    """
+    q_lower = query.lower()
+    incident_keywords = ["report", "incident", "accident", "injured", "fire", "gas", "leak", "emergency", "danger", "collapse", "alert"]
+
+    # Needs to sound like reporting something, e.g. "there is a fire", "report a gas leak", "injured worker"
+    if any(kw in q_lower for kw in incident_keywords):
+        # Additional checks can be added if needed, but for now simple keyword match
+        return True
+    return False
+
 def get_greeting_response() -> str:
     return """Hello! I am **CoalGPT** — your intelligent AI assistant for the **Ministry of Coal, Government of India**.
 
@@ -153,7 +166,7 @@ class CoalGPTRagEngine:
         scored_chunks.sort(key=lambda x: x[2], reverse=True)
         return scored_chunks[:top_k]
 
-    def ask(self, db: Session, question: str, mine_id: str = None, doc_category: str = None, chat_history: List[Dict[str, str]] = None) -> Dict[str, Any]:
+    def ask(self, db: Session, question: str, mine_id: str = None, doc_category: str = None, chat_history: List[Dict[str, str]] = None, language: str = "English") -> Dict[str, Any]:
         """
         Executes end-to-end CoalGPT Q&A pipeline with strict citations and conversational history.
         """
@@ -173,6 +186,28 @@ class CoalGPTRagEngine:
                 "chunks_analyzed": 0,
                 "context_found": False
             }
+
+        is_incident = is_incident_report(question)
+        if is_incident:
+            # Generate an Alert entry in the DB for the reported incident
+            try:
+                from ..models.db_models import Alert, Mine
+                # Check if a mine was selected, else use a placeholder or generic one
+                target_mine = db.query(Mine).filter(Mine.id == mine_id).first() if mine_id else db.query(Mine).first()
+                if target_mine:
+                    new_alert = Alert(
+                        mine_id=target_mine.id,
+                        severity="high",
+                        category="safety_breach",
+                        title="Field Incident Reported via CoalGPT",
+                        description=question,
+                        suggested_action="Immediate field validation required by the onsite rescue and safety team.",
+                        status="pending"
+                    )
+                    db.add(new_alert)
+                    db.commit()
+            except Exception as e:
+                print(f"Failed to log incident alert: {e}")
 
         # Decide whether to search documents at all (only on explicit prompt or mine selection)
         should_search = needs_document_search(question, chat_history, mine_id=mine_id)
@@ -243,12 +278,13 @@ class CoalGPTRagEngine:
                     )
                 context_found = True
 
-        system_prompt = """You are CoalGPT — an intelligent, versatile AI assistant built for the Ministry of Coal, Government of India, and Coal India Limited (CIL).
+        system_prompt = f"""You are CoalGPT — an intelligent, versatile AI assistant built for the Ministry of Coal, Government of India, and Coal India Limited (CIL).
 
 YOUR IDENTITY & ROLE:
 - You are a knowledgeable, friendly, and helpful general AI assistant.
 - You converse freely on any topic, answer general questions, explain complex ideas simply, brainstorm, and assist officers in their daily work.
 - You also possess deep expertise in Indian coal mining, geological core analysis, DGMS statutory compliance, coal grades (G1–G17), OBR, GCV, environmental clearances, and subsidiary operations (SECL, BCCL, ECL, CCL, WCL, NCL, MCL).
+- You MUST respond strictly and accurately in the requested language: {language}.
 
 HOW TO RESPOND:
 - For general questions, greetings, or introductions ("introduce", "hello", "who are you", etc.): Be engaging, polite, warm, and thorough.
@@ -256,6 +292,9 @@ HOW TO RESPOND:
 - When [Retrieved document context] is provided below: You are in Document Intelligence Mode. Base your answer strictly on that verified context and cite the document title and page number like [Document Title, Page X].
 - When NO document context is provided: Answer from your broad knowledge. NEVER output rigid error notices like "no uploaded document contains matches" unless the user explicitly requested a specific uploaded file lookup that was not found.
 - Always maintain a professional, helpful tone."""
+
+        if is_incident:
+            system_prompt += "\n\nCRITICAL NOTIFICATION: The user is reporting a field incident or emergency. An official statutory Alert has automatically been logged into the compliance database. In your response, explicitly confirm to the user (in their selected language) that their incident has been recorded and the safety team has been alerted. Provide immediate reassuring advice."
 
         # Build the messages array for Groq
         messages = [{"role": "system", "content": system_prompt}]

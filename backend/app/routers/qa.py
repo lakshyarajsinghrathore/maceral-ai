@@ -22,7 +22,8 @@ def ask_coalgpt(payload: QARequest, db: Session = Depends(get_db)):
         question=payload.question,
         mine_id=payload.mine_id if not payload.include_all_mines else None,
         doc_category=payload.doc_category,
-        chat_history=history
+        chat_history=history,
+        language=payload.language
     )
     return result
 
