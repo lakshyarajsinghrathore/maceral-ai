@@ -12,21 +12,36 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png',
 });
 
-// Create custom colored icons for compliance status
+// Create self-contained SVG pins for compliance status (no external image CDN dependency)
 const createIcon = (color) => {
-  return new L.Icon({
-    iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
+  const colorMap = {
+    green: '#10B981',
+    amber: '#F59E0B',
+    red: '#EF4444',
+    blue: '#3B82F6'
+  };
+  const hex = colorMap[color] || '#3B82F6';
+
+  return L.divIcon({
+    className: 'custom-mine-pin',
+    html: `
+      <div style="position: relative; width: 28px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+        <svg viewBox="0 0 24 32" width="28" height="36" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 8.5 12 20 12 20s12-11.5 12-20c0-6.63-5.37-12-12-12z" fill="${hex}" stroke="#FFFFFF" stroke-width="1.5" />
+          <circle cx="12" cy="11" r="5" fill="#FFFFFF" />
+          <circle cx="12" cy="11" r="3" fill="${hex}" />
+        </svg>
+      </div>
+    `,
+    iconSize: [28, 36],
+    iconAnchor: [14, 36],
+    popupAnchor: [0, -36]
   });
 };
 
 const icons = {
   green: createIcon('green'),
-  amber: createIcon('gold'), // Using gold for amber
+  amber: createIcon('amber'),
   red: createIcon('red'),
   blue: createIcon('blue')
 };
@@ -91,7 +106,8 @@ export default function GISMap({ mines = [], scores = [], alerts = [] }) {
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maxZoom={19}
         />
         
         {mapData.map((mine, idx) => (
