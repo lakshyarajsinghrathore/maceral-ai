@@ -132,20 +132,20 @@ const MobileInspection = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0C1222] text-slate-200 p-4 font-sans max-w-md mx-auto">
+    <div className="min-h-screen bg-gray-50 text-gray-900 p-4 font-sans max-w-md mx-auto">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl font-bold text-white flex items-center">
-          <MapPin className="w-5 h-5 mr-2 text-indigo-400" />
+        <h1 className="text-xl font-bold text-gray-900 flex items-center">
+          <MapPin className="w-5 h-5 mr-2 text-blue-600" />
           Field Report (PWA)
         </h1>
         <div className="flex items-center space-x-2 text-sm font-semibold">
           {isOnline ? (
-            <span className="flex items-center text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md border border-emerald-500/20">
+            <span className="flex items-center text-green-700 bg-green-50 px-2 py-1 rounded-md border border-green-200">
               <Wifi className="w-4 h-4 mr-1" /> Online
             </span>
           ) : (
-            <span className="flex items-center text-amber-400 bg-amber-400/10 px-2 py-1 rounded-md border border-amber-500/20">
+            <span className="flex items-center text-amber-700 bg-amber-50 px-2 py-1 rounded-md border border-amber-200">
               <WifiOff className="w-4 h-4 mr-1" /> Offline
             </span>
           )}
@@ -153,24 +153,24 @@ const MobileInspection = () => {
       </div>
 
       {successMsg && (
-        <div className="mb-4 p-3 bg-emerald-500/20 border border-emerald-500 rounded-lg flex items-center text-emerald-300">
+        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center text-green-800">
           <CheckCircle className="w-5 h-5 mr-2" />
           <span className="text-sm">{successMsg}</span>
         </div>
       )}
 
       {/* Main Form */}
-      <form onSubmit={handleSubmit} className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-5">
+      <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-5">
 
         {/* Mine Selection */}
         <div>
-          <label className="block text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Target Mine Location</label>
+          <label className="block text-xs text-gray-600 uppercase tracking-wider font-bold mb-1">Target Mine Location</label>
           <select
             name="mine_id"
             value={formData.mine_id}
             onChange={handleInputChange}
             required
-            className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-3 py-3 text-slate-100 focus:outline-none focus:border-indigo-500"
+            className="w-full bg-white border border-gray-300 rounded-xl px-3 py-3 text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           >
             <option value="" disabled>Select Mine...</option>
             {mines.map(m => (
@@ -180,55 +180,55 @@ const MobileInspection = () => {
         </div>
 
         {/* GPS Capture */}
-        <div className="p-4 bg-[#0a0f1c] border border-slate-800/80 rounded-xl">
+        <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs text-slate-400 uppercase tracking-wider font-bold">GPS Coordinates</span>
+            <span className="text-xs text-gray-600 uppercase tracking-wider font-bold">GPS Coordinates</span>
             <button
               type="button"
               onClick={requestGeolocation}
               disabled={locating}
-              className="text-xs flex items-center bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/30 border border-indigo-500/30 px-3 py-1 rounded-lg transition-colors"
+              className="text-xs flex items-center bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 px-3 py-1 rounded-lg transition-colors"
             >
               <Navigation className="w-3 h-3 mr-1" />
               {locating ? "Acquiring..." : (location.lat ? "Retake GPS" : "Capture GPS")}
             </button>
           </div>
-          <div className="text-sm font-mono text-slate-300">
+          <div className="text-sm font-mono text-gray-700">
             {location.lat ? (
               <div className="space-y-1">
-                <p>Lat: <span className="text-emerald-400">{location.lat.toFixed(6)}</span></p>
-                <p>Lng: <span className="text-emerald-400">{location.lng.toFixed(6)}</span></p>
-                <p className="text-xs text-slate-500">Accuracy: {Math.round(location.accuracy)}m</p>
+                <p>Lat: <span className="text-gray-900 font-semibold">{location.lat.toFixed(6)}</span></p>
+                <p>Lng: <span className="text-gray-900 font-semibold">{location.lng.toFixed(6)}</span></p>
+                <p className="text-xs text-gray-500">Accuracy: {Math.round(location.accuracy)}m</p>
               </div>
             ) : (
-              <p className="text-slate-500 italic">No GPS data captured yet.</p>
+              <p className="text-gray-500 italic">No GPS data captured yet.</p>
             )}
           </div>
         </div>
 
         {/* Violations Count */}
         <div>
-          <label className="block text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Violations / Flags</label>
+          <label className="block text-xs text-gray-600 uppercase tracking-wider font-bold mb-1">Violations / Flags</label>
           <input
             type="number"
             name="violations_found"
             min="0"
             value={formData.violations_found}
             onChange={handleInputChange}
-            className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-3 py-3 text-slate-100 focus:outline-none focus:border-indigo-500"
+            className="w-full bg-white border border-gray-300 rounded-xl px-3 py-3 text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
         </div>
 
         {/* Notes */}
         <div>
-          <label className="block text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Inspector Notes</label>
+          <label className="block text-xs text-gray-600 uppercase tracking-wider font-bold mb-1">Inspector Notes</label>
           <textarea
             name="inspector_notes"
             rows={4}
             value={formData.inspector_notes}
             onChange={handleInputChange}
             placeholder="Document any hazards, equipment issues, or compliance breaches..."
-            className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-3 py-3 text-slate-100 focus:outline-none focus:border-indigo-500 resize-none text-sm"
+            className="w-full bg-white border border-gray-300 rounded-xl px-3 py-3 text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none text-sm"
           ></textarea>
         </div>
 
@@ -236,7 +236,7 @@ const MobileInspection = () => {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full py-4 rounded-xl font-bold flex items-center justify-center space-x-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-md transition-all"
+          className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all shadow-blue-500/20 active:bg-blue-800 disabled:opacity-50"
         >
           <Save className="w-5 h-5" />
           <span>{isOnline ? "Submit to Headquarters" : "Save Offline securely"}</span>

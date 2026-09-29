@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
@@ -12,16 +12,27 @@ import AuthPage from './pages/AuthPage';
 
 // Protected layout wrapper containing Dashboard Navbar and Sidebar
 function ProtectedLayout() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const token = localStorage.getItem('auth_token');
   if (!token) {
     return <Navigate to="/login" replace />;
   }
   return (
-    <div className="min-h-screen bg-[#090D16] text-slate-100 flex flex-col font-sans">
-      <Navbar />
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
-        <main className="flex-1 overflow-y-auto bg-[#090D16]">
+    <div className="min-h-screen bg-gray-50 text-gray-900 flex flex-col font-sans">
+      <Navbar onMenuClick={() => setSidebarOpen(true)} />
+      <div className="flex flex-1 overflow-hidden relative">
+        <Sidebar className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-200 ease-in-out absolute z-20 md:relative h-full`} onClose={() => setSidebarOpen(false)} />
+
+        {/* Mobile overlay */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-gray-900/50 z-10 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        <main className="flex-1 overflow-y-auto bg-gray-50 w-full">
           <Outlet />
         </main>
       </div>

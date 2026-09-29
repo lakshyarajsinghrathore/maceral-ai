@@ -318,22 +318,22 @@ export default function CoalGPT() {
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto h-[calc(100vh-80px)] flex flex-col space-y-4">
+    <div className="p-4 sm:p-6 max-w-5xl mx-auto h-[calc(100vh-80px)] flex flex-col space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-200 pb-3">
         <div>
           <div className="flex items-center space-x-2">
-            <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-              <Bot className="h-5 w-5 text-amber-400" />
+            <h2 className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
+              <Bot className="h-5 w-5 text-blue-600" />
               CoalGPT Parliamentary & Audit Q&A
             </h2>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-gray-500 mt-0.5">
             Real-time conversational AI & on-demand source-verified document synthesis.
           </p>
         </div>
 
-        <div className="flex items-center space-x-2 text-xs relative">
+        <div className="flex items-center space-x-2 text-xs relative flex-wrap gap-y-2">
           {/* History Button & Dropdown (Last 5 Full Conversations) */}
           <div className="relative">
             <button
@@ -341,14 +341,14 @@ export default function CoalGPT() {
               onClick={() => setShowHistoryDropdown(!showHistoryDropdown)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all text-xs font-medium ${
                 showHistoryDropdown
-                  ? 'bg-amber-500/20 border-amber-500/40 text-amber-300'
-                  : 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-300'
+                  ? 'bg-blue-50 border-blue-200 text-blue-700'
+                  : 'bg-white hover:bg-gray-50 border-gray-200 text-gray-700'
               }`}
               title="View conversation history (last 5 sessions)"
             >
-              <History className="h-3.5 w-3.5 text-amber-400" />
+              <History className="h-3.5 w-3.5 text-blue-600" />
               <span>History</span>
-              <span className="px-1.5 py-0.2 rounded-full bg-slate-800 text-[10px] font-mono text-amber-400 font-bold">
+              <span className="px-1.5 py-0.2 rounded-full bg-gray-100 text-[10px] font-mono text-blue-700 font-bold border border-gray-200">
                 {conversations.length}/5
               </span>
             </button>
@@ -362,16 +362,16 @@ export default function CoalGPT() {
                   onClick={() => setShowHistoryDropdown(false)}
                 />
 
-                <div className="absolute right-0 top-full mt-2 w-84 sm:w-96 bg-[#0C1222] border border-slate-800 rounded-2xl shadow-2xl p-3 z-50 backdrop-blur-xl space-y-2">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-800 text-xs">
-                    <span className="font-bold text-slate-200 flex items-center gap-1.5 font-mono">
-                      <History className="h-3.5 w-3.5 text-amber-400" /> Saved Conversations ({conversations.length}/5)
+                <div className="absolute right-0 top-full mt-2 w-84 sm:w-96 bg-white border border-gray-200 rounded-2xl shadow-xl p-3 z-50 space-y-2">
+                  <div className="flex items-center justify-between pb-2 border-b border-gray-100 text-xs">
+                    <span className="font-bold text-gray-900 flex items-center gap-1.5 font-mono">
+                      <History className="h-3.5 w-3.5 text-blue-600" /> Saved Conversations ({conversations.length}/5)
                     </span>
                     {conversations.length > 0 && (
                       <button
                         type="button"
                         onClick={handleClearAllConversations}
-                        className="text-[10px] text-slate-500 hover:text-rose-400 transition-colors flex items-center gap-1 font-medium"
+                        className="text-[10px] text-gray-500 hover:text-red-600 transition-colors flex items-center gap-1 font-medium"
                       >
                         <Trash2 className="h-3 w-3" /> Clear All
                       </button>
@@ -380,8 +380,8 @@ export default function CoalGPT() {
 
                   {conversations.length === 0 ? (
                     <div className="py-6 text-center space-y-1">
-                      <p className="text-slate-400 text-xs font-medium">No saved conversations yet</p>
-                      <p className="text-slate-600 text-[11px]">Conversations are automatically preserved here as you chat.</p>
+                      <p className="text-gray-500 text-xs font-medium">No saved conversations yet</p>
+                      <p className="text-gray-400 text-[11px]">Conversations are automatically preserved here as you chat.</p>
                     </div>
                   ) : (
                     <div className="space-y-1.5 max-h-80 overflow-y-auto pr-1">
@@ -393,21 +393,21 @@ export default function CoalGPT() {
                             onClick={() => handleSelectConversation(conv)}
                             className={`p-3 rounded-xl border cursor-pointer transition-all text-left space-y-1.5 ${
                               isActive
-                                ? 'bg-amber-500/10 border-amber-500/40 shadow-sm shadow-amber-500/10'
-                                : 'bg-slate-900/90 hover:bg-slate-800 border-slate-800/80'
+                                ? 'bg-blue-50 border-blue-200'
+                                : 'bg-white hover:bg-gray-50 border-gray-100'
                             }`}
                           >
                             <div className="flex justify-between items-start gap-2">
                               <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                                <MessageSquare className={`h-3.5 w-3.5 shrink-0 ${isActive ? 'text-amber-400' : 'text-slate-500'}`} />
-                                <span className={`text-xs font-semibold truncate ${isActive ? 'text-amber-300' : 'text-slate-200'}`}>
+                                <MessageSquare className={`h-3.5 w-3.5 shrink-0 ${isActive ? 'text-blue-600' : 'text-gray-400'}`} />
+                                <span className={`text-xs font-semibold truncate ${isActive ? 'text-blue-900' : 'text-gray-800'}`}>
                                   {conv.title}
                                 </span>
                               </div>
                               <button
                                 type="button"
                                 onClick={(e) => handleDeleteConversation(e, conv.id)}
-                                className="text-slate-500 hover:text-rose-400 p-0.5 rounded transition-colors shrink-0"
+                                className="text-gray-400 hover:text-red-600 p-0.5 rounded transition-colors shrink-0"
                                 title="Delete this conversation"
                               >
                                 <Trash2 className="h-3.5 w-3.5" />
@@ -415,18 +415,18 @@ export default function CoalGPT() {
                             </div>
 
                             {conv.preview && (
-                              <p className="text-[11px] text-slate-400 line-clamp-1">
+                              <p className="text-[11px] text-gray-500 line-clamp-1">
                                 {conv.preview}
                               </p>
                             )}
 
-                            <div className="flex items-center justify-between pt-1 border-t border-slate-800/50 text-[10px] font-mono text-slate-500">
+                            <div className="flex items-center justify-between pt-1 border-t border-gray-100 text-[10px] font-mono text-gray-400">
                               <div className="flex items-center gap-2">
-                                <span className="text-slate-400">
+                                <span className="text-gray-500">
                                   {conv.messageCount || conv.messages?.filter(m => m.id !== 'welcome').length || 0} messages
                                 </span>
                                 {conv.citationsCount > 0 && (
-                                  <span className="text-sky-400">
+                                  <span className="text-blue-600">
                                     {conv.citationsCount} citations
                                   </span>
                                 )}
@@ -434,7 +434,7 @@ export default function CoalGPT() {
                               <div className="flex items-center gap-2">
                                 <span>{conv.updatedAt}</span>
                                 {isActive && (
-                                  <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-bold">
+                                  <span className="px-1.5 py-0.2 rounded bg-blue-100 text-blue-700 border border-blue-200 text-[9px] font-bold">
                                     Active
                                   </span>
                                 )}
@@ -454,10 +454,10 @@ export default function CoalGPT() {
           <button
             type="button"
             onClick={handleNewChat}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 rounded-xl transition-all text-xs"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded-xl transition-all text-xs shadow-sm"
             title="Start fresh conversation"
           >
-            <RotateCcw className="h-3.5 w-3.5 text-slate-400" />
+            <RotateCcw className="h-3.5 w-3.5 text-gray-500" />
             <span>New Chat</span>
           </button>
 
@@ -465,7 +465,7 @@ export default function CoalGPT() {
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="bg-slate-900 border border-slate-800 text-slate-300 rounded-xl px-2 py-1.5 focus:outline-none focus:border-amber-500 text-xs"
+            className="bg-white border border-gray-200 text-gray-700 rounded-xl px-2 py-1.5 focus:outline-none focus:border-blue-500 text-xs shadow-sm"
             title="Select Interface Language"
           >
             <option value="English">🇬🇧 English</option>
@@ -477,7 +477,7 @@ export default function CoalGPT() {
           <select
             value={selectedMine}
             onChange={(e) => setSelectedMine(e.target.value)}
-            className="bg-slate-900 border border-slate-800 text-slate-300 rounded-xl px-3 py-1.5 focus:outline-none focus:border-amber-500 text-xs"
+            className="bg-white border border-gray-200 text-gray-700 rounded-xl px-3 py-1.5 focus:outline-none focus:border-blue-500 text-xs shadow-sm"
           >
             <option value="">All Monitored Mines</option>
             {mines.map((m) => (
@@ -490,46 +490,48 @@ export default function CoalGPT() {
       </div>
 
       {/* Suggested Chips */}
-      <div className="flex items-center space-x-2 overflow-x-auto py-1 text-xs">
-        <span className="text-slate-500 font-mono text-[11px] shrink-0">Sample Queries:</span>
+      <div className="flex items-center space-x-2 overflow-x-auto py-1 text-xs scrollbar-none">
+        <span className="text-gray-400 font-mono text-[11px] shrink-0">Sample Queries:</span>
         {PRE_CANNED_QUESTIONS.map((q, idx) => (
           <button
             key={idx}
             onClick={() => handleSend(q)}
             disabled={loading}
-            className="px-3 py-1.5 bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-slate-300 rounded-xl whitespace-nowrap transition-all text-[11px] flex items-center gap-1.5 shrink-0"
+            className="px-3 py-1.5 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded-xl whitespace-nowrap transition-all text-[11px] flex items-center gap-1.5 shrink-0 shadow-sm"
           >
-            <ChevronRight className="h-3 w-3 text-amber-400" />
+            <ChevronRight className="h-3 w-3 text-blue-600" />
             <span className="truncate max-w-[280px]">{q}</span>
           </button>
         ))}
       </div>
 
       {/* Messages Container */}
-      <div className="flex-1 bg-[#10172B] border border-slate-800 rounded-2xl p-4 overflow-y-auto space-y-4 shadow-inner">
+      <div className="flex-1 bg-white border border-gray-200 rounded-2xl p-4 overflow-y-auto space-y-4 shadow-sm">
         {messages.map((m) => {
           const isUser = m.role === 'user';
           return (
             <div key={m.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[85%] rounded-2xl p-4 space-y-3 ${
                 isUser
-                  ? 'bg-amber-500/15 border border-amber-500/30 text-slate-100 rounded-tr-sm'
-                  : 'bg-slate-900/90 border border-slate-800 text-slate-200 rounded-tl-sm shadow-md'
+                  ? 'bg-blue-600 text-white rounded-tr-sm shadow-sm'
+                  : 'bg-gray-50 border border-gray-200 text-gray-800 rounded-tl-sm shadow-sm'
               }`}>
                 {/* Message Header */}
-                <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono border-b border-slate-800/80 pb-1.5">
-                  <span className="font-semibold text-amber-400 flex items-center gap-1.5">
+                <div className={`flex items-center justify-between text-[11px] font-mono border-b pb-1.5 ${
+                  isUser ? 'border-blue-500 text-blue-100' : 'border-gray-200 text-gray-500'
+                }`}>
+                  <span className={`font-semibold flex items-center gap-1.5 ${isUser ? 'text-white' : 'text-blue-600'}`}>
                     {isUser ? (
                       'Ministry Officer'
                     ) : (
                       <>
-                        <div className="h-5 w-5 rounded bg-white flex items-center justify-center p-0.5 shadow-sm shrink-0">
+                        <div className="h-5 w-5 rounded bg-white border border-gray-200 flex items-center justify-center p-0.5 shadow-sm shrink-0">
                           <img src="/logo.png" alt="CoalGPT" className="h-4 w-auto object-contain" />
                         </div>
                         <span>CoalGPT AI Intelligence</span>
                         <button
                           onClick={() => playTTS(m.content)}
-                          className="ml-2 text-slate-500 hover:text-amber-400 transition-colors"
+                          className="ml-2 text-gray-400 hover:text-blue-600 transition-colors"
                           title="Read aloud"
                         >
                           <Volume2 className="h-3.5 w-3.5" />
@@ -539,12 +541,12 @@ export default function CoalGPT() {
                   </span>
                   <div className="flex items-center space-x-2">
                     {m.responseTime && (
-                      <span className="flex items-center gap-1 text-emerald-400">
+                      <span className={`flex items-center gap-1 ${isUser ? 'text-blue-100' : 'text-green-600'}`}>
                         <Clock className="h-3 w-3" /> {(m.responseTime / 1000).toFixed(2)}s
                       </span>
                     )}
                     {m.model && (
-                      <span className="text-slate-500 font-mono text-[10px]">
+                      <span className={`font-mono text-[10px] ${isUser ? 'text-blue-200' : 'text-gray-400'}`}>
                         {m.model}
                       </span>
                     )}
@@ -558,8 +560,8 @@ export default function CoalGPT() {
 
                 {/* Source Citations Section */}
                 {m.citations && m.citations.length > 0 && (
-                  <div className="pt-2 border-t border-slate-800 space-y-2">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1 font-mono">
+                  <div className="pt-2 border-t border-gray-200 space-y-2">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1 font-mono">
                       <Bookmark className="h-3 w-3" /> Verified Document Citations ({m.citations.length})
                     </p>
                     <div className="grid grid-cols-1 gap-2">
@@ -576,8 +578,8 @@ export default function CoalGPT() {
 
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2 rounded-tl-sm text-xs font-mono text-slate-400 flex items-center space-x-3">
-              <Loader2 className="h-4 w-4 animate-spin text-amber-400" />
+            <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 space-y-2 rounded-tl-sm text-xs font-mono text-gray-500 flex items-center space-x-3">
+              <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
               <span>Retrieving relevant chunks & synthesizing citation-backed response via Neural RAG...</span>
             </div>
           </div>
@@ -593,8 +595,8 @@ export default function CoalGPT() {
           onClick={toggleListening}
           className={`p-3 rounded-xl transition-all shadow-sm flex items-center justify-center shrink-0 ${
             isListening
-              ? 'bg-rose-500/20 text-rose-400 border border-rose-500/50 animate-pulse'
-              : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-amber-400 hover:border-amber-500/50'
+              ? 'bg-red-50 text-red-600 border border-red-200 animate-pulse'
+              : 'bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-300'
           }`}
           title="Dictate in regional language"
         >
@@ -606,15 +608,15 @@ export default function CoalGPT() {
           onChange={(e) => setInput(e.target.value)}
           placeholder={isListening ? "Listening..." : "Ask any parliamentary query, safety record, or report an incident..."}
           disabled={loading}
-          className="flex-1 bg-[#10172B] border border-slate-800 rounded-xl px-4 py-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 shadow-sm"
+          className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm"
         />
         <button
           type="submit"
           disabled={!input.trim() || loading}
           className={`px-5 py-3 rounded-xl font-bold text-xs flex items-center space-x-2 transition-all ${
             !input.trim() || loading
-              ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-              : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+              ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+              : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm'
           }`}
         >
           <span>Ask CoalGPT</span>

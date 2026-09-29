@@ -6,8 +6,8 @@ import {
   Bot,
   FileSpreadsheet,
   ShieldAlert,
-  Layers,
-  MapPin
+  MapPin,
+  X
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -43,14 +43,29 @@ const NAV_ITEMS = [
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ className, onClose }) {
   return (
-    <aside className="w-64 bg-[#0B1120] border-r border-slate-800/80 flex flex-col justify-between p-4 min-h-[calc(100vh-61px)]">
+    <aside className={`w-64 bg-white border-r border-gray-200 flex flex-col justify-between p-4 ${className || ''}`}>
       <div className="space-y-6">
-        <div>
-          <p className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">
-            Intelligence Modules
+        <div className="flex items-center justify-between md:hidden">
+          <p className="px-3 text-[11px] font-bold uppercase tracking-wider text-gray-400">
+            Navigation
           </p>
+          <button
+            onClick={onClose}
+            className="p-1 text-gray-400 hover:text-gray-600 focus:outline-none"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {!className && (
+           <p className="hidden md:block px-3 text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">
+             Intelligence Modules
+           </p>
+        )}
+
+        <div>
           <nav className="space-y-1">
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
@@ -58,11 +73,12 @@ export default function Sidebar() {
                 <NavLink
                   key={item.to}
                   to={item.to}
+                  onClick={onClose}
                   className={({ isActive }) =>
                     `flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                       isActive
-                        ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-sm'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
+                        ? 'bg-blue-50 text-blue-700'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`
                   }
                 >
@@ -74,15 +90,15 @@ export default function Sidebar() {
           </nav>
         </div>
 
-        <div className="p-3.5 bg-slate-900/80 border border-slate-800 rounded-xl">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
-            <span className="font-semibold text-slate-300">National Target FY25</span>
-            <span className="text-amber-400 font-mono font-bold">1,080 MT</span>
+        <div className="p-3.5 bg-gray-50 border border-gray-200 rounded-xl">
+          <div className="flex items-center justify-between text-xs text-gray-500 mb-1.5">
+            <span className="font-semibold text-gray-700">National Target FY25</span>
+            <span className="text-blue-700 font-mono font-bold">1,080 MT</span>
           </div>
-          <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-            <div className="bg-gradient-to-r from-amber-500 to-emerald-400 h-2 rounded-full w-[88%]"></div>
+          <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+            <div className="bg-blue-500 h-2 rounded-full w-[88%]"></div>
           </div>
-          <div className="flex justify-between text-[11px] text-slate-500 mt-1 font-mono">
+          <div className="flex justify-between text-[11px] text-gray-500 mt-1 font-mono">
             <span>YTD: 950.4 MT</span>
             <span>88% achieved</span>
           </div>
@@ -90,12 +106,12 @@ export default function Sidebar() {
       </div>
 
       {/* Footer Info */}
-      <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-900 text-xs text-slate-500 space-y-1">
-        <p className="font-medium text-slate-400 flex items-center gap-1.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+      <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 text-xs text-gray-500 space-y-1">
+        <p className="font-medium text-gray-700 flex items-center gap-1.5">
+          <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
           AI Architecture v1.0
         </p>
-        <p className="text-[11px] text-slate-600">Zero recurring cloud infrastructure costs.</p>
+        <p className="text-[11px] text-gray-500">Cloud infrastructure optimized.</p>
       </div>
     </aside>
   );

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Activity, Bell, FileText, Cpu, CheckCircle2, LogOut, User } from 'lucide-react';
+import { ShieldCheck, Activity, Bell, FileText, Cpu, CheckCircle2, LogOut, User, Menu } from 'lucide-react';
 import { checkHealth, fetchAlerts } from '../api/client';
 
-export default function Navbar() {
+export default function Navbar({ onMenuClick }) {
   const [online, setOnline] = useState(false);
   const [groqReady, setGroqReady] = useState(false);
   const [criticalAlerts, setCriticalAlerts] = useState(0);
@@ -38,62 +38,70 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="bg-[#0D1424] border-b border-slate-800/80 sticky top-0 z-50 backdrop-blur-md bg-opacity-90">
-      <div className="px-6 py-3.5 flex items-center justify-between">
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+      <div className="px-4 md:px-6 py-3.5 flex items-center justify-between">
         {/* Left Branding */}
         <div className="flex items-center space-x-3.5">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-amber-600 via-amber-500 to-yellow-400 p-0.5 shadow-lg shadow-amber-500/20 flex items-center justify-center overflow-hidden">
+          <button
+            onClick={onMenuClick}
+            className="md:hidden p-1 -ml-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg focus:outline-none"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+
+          <div className="h-10 w-10 rounded-xl bg-gray-50 border border-gray-100 p-0.5 flex items-center justify-center overflow-hidden">
             <div className="h-full w-full bg-white rounded-[10px] flex items-center justify-center p-1">
               <img src="/logo.png" alt="Maceral AI" className="h-7 w-auto object-contain" />
             </div>
           </div>
-          <div>
+          <div className="hidden sm:block">
             <div className="flex items-center space-x-2">
-              <h1 className="text-base font-bold text-white tracking-wide">
+              <h1 className="text-base font-bold text-gray-900 tracking-wide">
                 Maceral AI
               </h1>
             </div>
-            <p className="text-xs text-slate-400 flex items-center gap-1.5 font-mono">
-              <span>Unified Geological & Mining Platform</span>
-              <span className="text-slate-600">•</span>
-              <span className="text-slate-300">Team BYTE MINERS</span>
+            <p className="text-xs text-gray-500 flex items-center gap-1.5 font-mono">
+              <span className="hidden lg:inline">Unified Geological & Mining Platform</span>
+              <span className="hidden lg:inline text-gray-300">•</span>
+              <span className="text-gray-500">Team BYTE MINERS</span>
             </p>
           </div>
         </div>
 
         {/* Right Status & Meta */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3 md:space-x-4">
 
           {/* Backend Status */}
-          <div className="flex items-center space-x-2 px-3 py-1.5 bg-slate-900/90 border border-slate-800 rounded-lg text-xs">
-            <span className={`h-2 w-2 rounded-full ${online ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`}></span>
-            <span className="text-slate-300 font-medium">{online ? 'Backend Live' : 'Connecting...'}</span>
+          <div className="hidden md:flex items-center space-x-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs">
+            <span className={`h-2 w-2 rounded-full ${online ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
+            <span className="text-gray-700 font-medium">{online ? 'Backend Live' : 'Connecting...'}</span>
           </div>
 
           {/* Alert Counter */}
           {criticalAlerts > 0 && (
-            <div className="flex items-center space-x-1.5 px-3 py-1.5 bg-red-500/10 border border-red-500/30 rounded-lg text-xs text-red-300 animate-pulse">
-              <Bell className="h-3.5 w-3.5 text-red-400" />
-              <span className="font-semibold">{criticalAlerts} Active Risk Alert{criticalAlerts > 1 ? 's' : ''}</span>
+            <div className="flex items-center space-x-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
+              <Bell className="h-3.5 w-3.5 text-red-500" />
+              <span className="font-semibold hidden sm:inline">{criticalAlerts} Active Risk Alert{criticalAlerts > 1 ? 's' : ''}</span>
+              <span className="font-semibold sm:hidden">{criticalAlerts}</span>
             </div>
           )}
 
           {/* User Profile & Sign Out */}
           {user && (
-            <div className="flex items-center space-x-2 pl-2 border-l border-slate-800">
-              <div className="flex items-center space-x-2 px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs">
-                <div className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-[10px]">
+            <div className="flex items-center space-x-2 md:pl-2 md:border-l border-gray-200">
+              <div className="hidden sm:flex items-center space-x-2 px-2.5 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs">
+                <div className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-[10px]">
                   {user.full_name ? user.full_name[0].toUpperCase() : 'U'}
                 </div>
-                <span className="text-slate-200 font-medium max-w-[120px] truncate">{user.full_name || user.email}</span>
-                <span className="text-[10px] text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded font-mono uppercase">
+                <span className="text-gray-700 font-medium max-w-[120px] truncate">{user.full_name || user.email}</span>
+                <span className="text-[10px] text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded font-mono uppercase">
                   {user.role || 'Officer'}
                 </span>
               </div>
               <button
                 onClick={handleLogout}
                 title="Sign Out"
-                className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-900 rounded-lg border border-transparent hover:border-slate-800 transition-colors"
+                className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg border border-transparent transition-colors focus:outline-none"
               >
                 <LogOut className="h-4 w-4" />
               </button>
