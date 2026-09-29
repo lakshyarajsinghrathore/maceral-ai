@@ -36,6 +36,11 @@ const NAV_ITEMS = [
     label: 'Compliance & Alerts',
     icon: ShieldAlert,
   },
+  {
+    to: '/inspection',
+    label: 'Field Reporting (PWA)',
+    icon: MapPin,
+  },
 ];
 
 export default function Sidebar() {

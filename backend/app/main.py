@@ -19,7 +19,7 @@ from fastapi.responses import FileResponse
 
 from .config import settings
 from .database import init_db, SessionLocal
-from .routers import documents, qa, reports, compliance, auth
+from .routers import documents, qa, reports, compliance, auth, inspections
 
 # Create FastAPI application
 app = FastAPI(
@@ -56,6 +56,7 @@ app.include_router(documents.router)
 app.include_router(qa.router)
 app.include_router(reports.router)
 app.include_router(compliance.router)
+app.include_router(inspections.router)
 
 @app.on_event("startup")
 def startup_event():

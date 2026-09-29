@@ -139,6 +139,40 @@ class QAResponse(BaseModel):
 
 
 # Report Generation Schemas
+class InspectionCreate(BaseModel):
+    mine_id: str
+    inspector_id: str
+    inspector_name: str
+    gps_lat: Optional[float] = None
+    gps_lng: Optional[float] = None
+    geo_accuracy_meters: Optional[float] = None
+    photo_urls: Optional[List[str]] = []
+    checklist_data: Dict[str, Any]
+    violations_found: Optional[int] = 0
+    inspector_notes: Optional[str] = None
+    inspected_at: Optional[datetime] = None
+    is_offline_synced: Optional[bool] = False
+
+class InspectionResponse(BaseModel):
+    id: str
+    mine_id: str
+    inspector_id: str
+    inspector_name: str
+    gps_lat: Optional[float]
+    gps_lng: Optional[float]
+    geo_accuracy_meters: Optional[float]
+    photo_urls: List[str]
+    checklist_data: Dict[str, Any]
+    violations_found: int
+    inspector_notes: Optional[str]
+    sync_status: str
+    inspected_at: datetime
+    synced_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Report Generation Schemas
 class ReportRequest(BaseModel):
     mine_id: Optional[str] = None
     report_title: str
