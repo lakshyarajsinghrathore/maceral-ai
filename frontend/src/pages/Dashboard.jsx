@@ -25,6 +25,7 @@ import {
   Legend
 } from 'recharts';
 import StatCard from '../components/StatCard';
+import GISMap from '../components/GISMap';
 import { fetchMines, fetchAlerts, fetchDocuments, fetchReports } from '../api/client';
 
 export default function Dashboard() {
@@ -178,9 +179,21 @@ export default function Dashboard() {
           </div>
 
           {/* Interactive Mine Sites Grid */}
-          <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-            <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider mb-3">
-              Geographic Mine Block Directory (GIS Telemetry)
+          <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-5">
+            <div>
+              <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider flex items-center justify-between mb-3">
+                <span>Geospatial Mine Boundaries & Hazards</span>
+                <span className="text-[10px] font-mono text-gray-500 bg-gray-50 px-2 py-0.5 rounded border border-gray-200">
+                  Live Telemetry
+                </span>
+              </h3>
+              <div className="h-[400px] w-full rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
+                <GISMap mines={mines} alerts={alerts} scores={mines} />
+              </div>
+            </div>
+
+            <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider mb-2 pt-2 border-t border-gray-100">
+              Mine Block Directory
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {mines.map((m) => {
