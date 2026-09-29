@@ -45,7 +45,7 @@ const NAV_ITEMS = [
 
 export default function Sidebar({ className, onClose }) {
   return (
-    <aside className={`w-64 bg-white border-r border-gray-200 flex flex-col p-4 ${className || ''}`}>
+    <aside className={`w-64 bg-white border-r border-gray-200 flex flex-col p-4 h-full min-h-[calc(100vh-65px)] shrink-0 ${className || ''}`}>
       <div className="space-y-6">
         <div className="flex items-center justify-between md:hidden">
           <p className="px-3 text-[11px] font-bold uppercase tracking-wider text-gray-400">

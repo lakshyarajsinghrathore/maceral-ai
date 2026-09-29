@@ -19,10 +19,10 @@ function ProtectedLayout() {
     return <Navigate to="/login" replace />;
   }
   return (
-    <div className="min-h-screen bg-[#F5F3EE] text-gray-900 flex flex-col font-sans">
+    <div className="h-screen bg-[#F5F3EE] text-gray-900 flex flex-col font-sans overflow-hidden">
       <Navbar onMenuClick={() => setSidebarOpen(true)} />
       <div className="flex flex-1 overflow-hidden relative">
-        <Sidebar className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-200 ease-in-out absolute z-20 md:relative h-full`} onClose={() => setSidebarOpen(false)} />
+        <Sidebar className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-200 ease-in-out absolute z-20 md:relative h-full shrink-0`} onClose={() => setSidebarOpen(false)} />
 
         {/* Mobile overlay */}
         {sidebarOpen && (
