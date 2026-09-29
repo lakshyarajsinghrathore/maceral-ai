@@ -320,7 +320,7 @@ export default function CoalGPT() {
   return (
     <div className="p-4 sm:p-6 max-w-5xl mx-auto h-[calc(100vh-80px)] flex flex-col space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-200 pb-3">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-gray-200 pb-3">
         <div>
           <div className="flex items-center space-x-2">
             <h2 className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
@@ -333,7 +333,7 @@ export default function CoalGPT() {
           </p>
         </div>
 
-        <div className="flex items-center space-x-2 text-xs relative flex-wrap gap-y-2">
+        <div className="flex items-center space-x-2 text-xs relative flex-wrap sm:flex-nowrap gap-y-2 shrink-0">
           {/* History Button & Dropdown (Last 5 Full Conversations) */}
           <div className="relative">
             <button
@@ -477,7 +477,7 @@ export default function CoalGPT() {
           <select
             value={selectedMine}
             onChange={(e) => setSelectedMine(e.target.value)}
-            className="bg-white border border-gray-200 text-gray-700 rounded-xl px-3 py-1.5 focus:outline-none focus:border-blue-500 text-xs shadow-sm"
+            className="bg-white border border-gray-200 text-gray-700 rounded-xl px-3 py-1.5 focus:outline-none focus:border-blue-500 text-xs shadow-sm max-w-[170px] truncate"
           >
             <option value="">All Monitored Mines</option>
             {mines.map((m) => (

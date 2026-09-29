@@ -45,7 +45,7 @@ const NAV_ITEMS = [
 
 export default function Sidebar({ className, onClose }) {
   return (
-    <aside className={`w-64 bg-white border-r border-gray-200 flex flex-col justify-between p-4 ${className || ''}`}>
+    <aside className={`w-64 bg-white border-r border-gray-200 flex flex-col p-4 ${className || ''}`}>
       <div className="space-y-6">
         <div className="flex items-center justify-between md:hidden">
           <p className="px-3 text-[11px] font-bold uppercase tracking-wider text-gray-400">
@@ -89,29 +89,6 @@ export default function Sidebar({ className, onClose }) {
             })}
           </nav>
         </div>
-
-        <div className="p-3.5 bg-gray-50 border border-gray-200 rounded-xl">
-          <div className="flex items-center justify-between text-xs text-gray-500 mb-1.5">
-            <span className="font-semibold text-gray-700">National Target FY25</span>
-            <span className="text-blue-700 font-mono font-bold">1,080 MT</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-            <div className="bg-blue-500 h-2 rounded-full w-[88%]"></div>
-          </div>
-          <div className="flex justify-between text-[11px] text-gray-500 mt-1 font-mono">
-            <span>YTD: 950.4 MT</span>
-            <span>88% achieved</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer Info */}
-      <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 text-xs text-gray-500 space-y-1">
-        <p className="font-medium text-gray-700 flex items-center gap-1.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-          AI Architecture v1.0
-        </p>
-        <p className="text-[11px] text-gray-500">Cloud infrastructure optimized.</p>
       </div>
     </aside>
   );

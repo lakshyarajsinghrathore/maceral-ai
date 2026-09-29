@@ -60,22 +60,11 @@ export default function Navbar({ onMenuClick }) {
                 Maceral AI
               </h1>
             </div>
-            <p className="text-xs text-gray-500 flex items-center gap-1.5 font-mono">
-              <span className="hidden lg:inline">Unified Geological & Mining Platform</span>
-              <span className="hidden lg:inline text-gray-300">•</span>
-              <span className="text-gray-500">Team BYTE MINERS</span>
-            </p>
           </div>
         </div>
 
         {/* Right Status & Meta */}
         <div className="flex items-center space-x-3 md:space-x-4">
-
-          {/* Backend Status */}
-          <div className="hidden md:flex items-center space-x-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs">
-            <span className={`h-2 w-2 rounded-full ${online ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
-            <span className="text-gray-700 font-medium">{online ? 'Backend Live' : 'Connecting...'}</span>
-          </div>
 
           {/* Alert Counter */}
           {criticalAlerts > 0 && (

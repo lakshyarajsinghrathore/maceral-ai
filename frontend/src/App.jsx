@@ -19,7 +19,7 @@ function ProtectedLayout() {
     return <Navigate to="/login" replace />;
   }
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#F5F3EE] text-gray-900 flex flex-col font-sans">
       <Navbar onMenuClick={() => setSidebarOpen(true)} />
       <div className="flex flex-1 overflow-hidden relative">
         <Sidebar className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-200 ease-in-out absolute z-20 md:relative h-full`} onClose={() => setSidebarOpen(false)} />
@@ -32,7 +32,7 @@ function ProtectedLayout() {
           />
         )}
 
-        <main className="flex-1 overflow-y-auto bg-gray-50 w-full">
+        <main className="flex-1 overflow-y-auto bg-[#F5F3EE] w-full">
           <Outlet />
         </main>
       </div>
