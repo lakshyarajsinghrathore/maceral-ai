@@ -23,10 +23,3 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #94A3B8;
 }
-
-/* Desktop default 80% view scale (strictly for desktop view, preserving mobile 100%) */
-@media screen and (min-width: 1024px) {
-  html {
-    zoom: 0.8;
-  }
-}
