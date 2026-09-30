@@ -253,3 +253,114 @@ class TelemetrySummaryResponse(BaseModel):
     open_conditions_count: int
     operating_sites: List[Dict[str, Any]]
     active_flags: List[Dict[str, Any]]
+
+
+# Contractor & Grievance Schemas
+class ContractorCreate(BaseModel):
+    name: str
+    vendor_code: str
+    mine_id: Optional[str] = None
+    pan_number: Optional[str] = None
+    gstin: Optional[str] = None
+    category: str
+    contract_start: Optional[datetime] = None
+    contract_end: Optional[datetime] = None
+    worker_count: int = 0
+    safety_rating: float = 5.0
+    wage_compliance_pct: float = 100.0
+    epf_esic_compliance_pct: float = 100.0
+    status: str = "Compliant"
+
+
+class ContractorResponse(BaseModel):
+    id: str
+    mine_id: Optional[str] = None
+    mine_name: Optional[str] = None
+    name: str
+    vendor_code: str
+    pan_number: Optional[str] = None
+    gstin: Optional[str] = None
+    category: str
+    contract_start: Optional[datetime] = None
+    contract_end: Optional[datetime] = None
+    status: str
+    worker_count: int
+    safety_rating: float
+    wage_compliance_pct: float
+    epf_esic_compliance_pct: float
+    active_grievance_count: Optional[int] = 0
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class GrievanceActionLogResponse(BaseModel):
+    id: str
+    grievance_id: str
+    action: str
+    performed_by: str
+    notes: Optional[str] = None
+    previous_hash: Optional[str] = None
+    block_hash: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class LaborGrievanceCreate(BaseModel):
+    mine_id: Optional[str] = None
+    contractor_id: Optional[str] = None
+    labor_worker_name: Optional[str] = None
+    worker_phone: Optional[str] = None
+    is_anonymous: bool = False
+    grievance_type: str
+    priority: str = "Medium"
+    description: str
+    evidence_urls: Optional[List[str]] = []
+
+
+class LaborGrievanceStatusUpdate(BaseModel):
+    status: str # Open, Investigating, Action Taken, Resolved, Escalated
+    remedial_action_notes: Optional[str] = None
+    assigned_officer: Optional[str] = None
+    performed_by: str = "Compliance Officer"
+
+
+class LaborGrievanceResponse(BaseModel):
+    id: str
+    ticket_id: str
+    mine_id: Optional[str] = None
+    mine_name: Optional[str] = None
+    contractor_id: Optional[str] = None
+    contractor_name: Optional[str] = None
+    labor_worker_name: Optional[str] = None
+    worker_phone: Optional[str] = None
+    is_anonymous: bool
+    grievance_type: str
+    priority: str
+    status: str
+    description: str
+    remedial_action_notes: Optional[str] = None
+    assigned_officer: Optional[str] = None
+    evidence_urls: Optional[List[str]] = []
+    created_at: datetime
+    updated_at: datetime
+    resolved_at: Optional[datetime] = None
+    action_logs: Optional[List[GrievanceActionLogResponse]] = []
+
+    class Config:
+        from_attributes = True
+
+
+class ContractorSummaryResponse(BaseModel):
+    total_contractors: int
+    compliant_contractors: int
+    under_audit_contractors: int
+    flagged_contractors: int
+    total_active_labor: int
+    open_grievances: int
+    resolved_grievances: int
+    avg_wage_compliance_pct: float

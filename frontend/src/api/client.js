@@ -131,4 +131,54 @@ export const fetchCurrentUser = async () => {
   return response.data;
 };
 
+// Contractors & Labor Grievance API
+export const fetchContractorsSummary = async () => {
+  const response = await api.get('/api/contractors/summary');
+  return response.data;
+};
+
+export const fetchContractors = async (mineId = null, status = null) => {
+  const params = {};
+  if (mineId && mineId !== 'all') params.mine_id = mineId;
+  if (status && status !== 'all') params.status = status;
+  const response = await api.get('/api/contractors/', { params });
+  return response.data;
+};
+
+export const createContractor = async (contractorData) => {
+  const response = await api.post('/api/contractors/', contractorData);
+  return response.data;
+};
+
+export const fetchGrievances = async (mineId = null, contractorId = null, status = null, priority = null) => {
+  const params = {};
+  if (mineId && mineId !== 'all') params.mine_id = mineId;
+  if (contractorId && contractorId !== 'all') params.contractor_id = contractorId;
+  if (status && status !== 'all') params.status = status;
+  if (priority && priority !== 'all') params.priority = priority;
+  const response = await api.get('/api/contractors/grievances/list', { params });
+  return response.data;
+};
+
+export const createGrievance = async (grievanceData) => {
+  const response = await api.post('/api/contractors/grievances', grievanceData);
+  return response.data;
+};
+
+export const updateGrievanceStatus = async (grievanceId, updateData) => {
+  const response = await api.patch(`/api/contractors/grievances/${grievanceId}/status`, updateData);
+  return response.data;
+};
+
+export const fetchGrievanceAuditTrail = async (grievanceId) => {
+  const response = await api.get(`/api/contractors/grievances/${grievanceId}/audit-trail`);
+  return response.data;
+};
+
+export const exportContractorsCSV = () => {
+  const url = `${API_BASE_URL}/api/contractors/export`;
+  window.open(url, '_blank');
+};
+
 export default api;
+

@@ -78,6 +78,8 @@ class Mine(Base):
     alerts = relationship("Alert", back_populates="mine", cascade="all, delete-orphan")
     reports = relationship("Report", back_populates="mine")
     inspections = relationship("Inspection", back_populates="mine")
+    contractors = relationship("Contractor", back_populates="mine")
+    grievances = relationship("LaborGrievance", back_populates="mine")
 
 
 class Document(Base):
@@ -229,3 +231,68 @@ class Inspection(Base):
     synced_at = Column(DateTime, default=datetime.utcnow)
 
     mine = relationship("Mine", back_populates="inspections")
+
+
+class Contractor(Base):
+    __tablename__ = "contractors"
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    mine_id = Column(String(36), ForeignKey("mines.id", ondelete="SET NULL"), nullable=True)
+    name = Column(String(255), nullable=False)
+    vendor_code = Column(String(100), unique=True, nullable=False)
+    pan_number = Column(String(50), nullable=True)
+    gstin = Column(String(50), nullable=True)
+    category = Column(String(100), nullable=False) # Overburden Removal, Coal Transport, Drilling & Blasting, Equipment Maintenance
+    contract_start = Column(DateTime, nullable=True)
+    contract_end = Column(DateTime, nullable=True)
+    status = Column(String(50), default="Compliant") # Compliant, Flagged, Under Audit, Suspended
+    worker_count = Column(Integer, default=0)
+    safety_rating = Column(Float, default=5.0) # 1.0 - 5.0
+    wage_compliance_pct = Column(Float, default=100.0) # 0 - 100%
+    epf_esic_compliance_pct = Column(Float, default=100.0) # 0 - 100%
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    mine = relationship("Mine", back_populates="contractors")
+    grievances = relationship("LaborGrievance", back_populates="contractor")
+
+
+class LaborGrievance(Base):
+    __tablename__ = "labor_grievances"
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    ticket_id = Column(String(50), unique=True, nullable=False) # e.g. "GRV-2026-0042"
+    mine_id = Column(String(36), ForeignKey("mines.id", ondelete="SET NULL"), nullable=True)
+    contractor_id = Column(String(36), ForeignKey("contractors.id", ondelete="SET NULL"), nullable=True)
+    labor_worker_name = Column(String(255), nullable=True) # Optional or Anonymous
+    worker_phone = Column(String(50), nullable=True)
+    is_anonymous = Column(Boolean, default=False)
+    grievance_type = Column(String(100), nullable=False) # Delayed Wages, Wage Discrepancy, Safety Gear / PPE, Working Hours Violation, Harassment, Medical / ESIC
+    priority = Column(String(50), default="Medium") # Low, Medium, High, Critical
+    status = Column(String(50), default="Open") # Open, Investigating, Action Taken, Resolved, Escalated
+    description = Column(Text, nullable=False)
+    remedial_action_notes = Column(Text, nullable=True)
+    assigned_officer = Column(String(255), nullable=True)
+    evidence_urls = Column(JSON, default=list)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    resolved_at = Column(DateTime, nullable=True)
+
+    mine = relationship("Mine", back_populates="grievances")
+    contractor = relationship("Contractor", back_populates="grievances")
+    action_logs = relationship("GrievanceActionLog", back_populates="grievance", cascade="all, delete-orphan", order_by="GrievanceActionLog.created_at")
+
+
+class GrievanceActionLog(Base):
+    __tablename__ = "grievance_action_logs"
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    grievance_id = Column(String(36), ForeignKey("labor_grievances.id", ondelete="CASCADE"), nullable=False)
+    action = Column(String(100), nullable=False) # e.g. CREATED, STATUS_CHANGE, PENALTY_ISSUED, SHOW_CAUSE_NOTICE, RESOLVED
+    performed_by = Column(String(255), nullable=False) # officer email / name
+    notes = Column(Text, nullable=True)
+    previous_hash = Column(String(64), nullable=True)
+    block_hash = Column(String(64), nullable=False) # SHA-256(prev_hash + created_at + action + performed_by + notes)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    grievance = relationship("LaborGrievance", back_populates="action_logs")

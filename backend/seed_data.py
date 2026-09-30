@@ -1,7 +1,11 @@
 import uuid
+import hashlib
 from datetime import datetime
 from sqlalchemy.orm import Session
-from app.models.db_models import Mine, Document, DocumentChunk, ExtractedData, ComplianceScore, Alert, Report, User
+from app.models.db_models import (
+    Mine, Document, DocumentChunk, ExtractedData, ComplianceScore, Alert, Report, User,
+    Contractor, LaborGrievance, GrievanceActionLog
+)
 from app.services.report_generator import ReportGeneratorService
 from app.services.auth_service import hash_password
 from app.services.embedding_service import EmbeddingService
@@ -647,11 +651,200 @@ def seed_database(db: Session):
             report_title="National Coal Production & DGMS Statutory Safety Briefing",
             report_type="Ministry_Monthly_Executive",
             reporting_period="Q3 FY 2024-25",
-            mine_id="m1-gevra-secl",
+            mine_id="m-korba-central",
             file_format="pdf",
             custom_notes="Overall national coal evacuation sustained above 92% across all railway corridors."
         )
     except Exception as rep_err:
+        db.rollback()
         print(f"Seed report generation note: {rep_err}")
 
-    print(" Database successfully seeded with Indian Coal Mines, sample documents, and compliance metrics.")
+    # 5. Seed Mining Contractors and Labor Grievances with SHA-256 Audit Blocks
+    contractors_data = [
+        {
+            "id": "c-lt-mining",
+            "name": "L&T Heavy Engineering & Mining Logistics",
+            "vendor_code": "VEN-SECL-001",
+            "mine_id": "m-korba-central",
+            "pan_number": "AAACL1234F",
+            "gstin": "22AAACL1234F1Z5",
+            "category": "Overburden Removal & Earthmoving",
+            "contract_start": datetime(2024, 4, 1),
+            "contract_end": datetime(2027, 3, 31),
+            "status": "Compliant",
+            "worker_count": 420,
+            "safety_rating": 4.9,
+            "wage_compliance_pct": 98.5,
+            "epf_esic_compliance_pct": 99.0
+        },
+        {
+            "id": "c-beml-infra",
+            "name": "BEML Infra Mining Services Ltd",
+            "vendor_code": "VEN-BCCL-002",
+            "mine_id": "m-jharia-ug",
+            "pan_number": "AABCB5678K",
+            "gstin": "20AABCB5678K1ZA",
+            "category": "Drilling, Blasting & Machinery Maintenance",
+            "contract_start": datetime(2023, 10, 1),
+            "contract_end": datetime(2026, 9, 30),
+            "status": "Under Audit",
+            "worker_count": 280,
+            "safety_rating": 4.2,
+            "wage_compliance_pct": 88.0,
+            "epf_esic_compliance_pct": 89.5
+        },
+        {
+            "id": "c-singrauli-haulage",
+            "name": "Singrauli Haulage & Coal Logistics Pvt Ltd",
+            "vendor_code": "VEN-NCL-003",
+            "mine_id": "m-singrauli-north",
+            "pan_number": "AALCS9012M",
+            "gstin": "09AALCS9012M1Z2",
+            "category": "Coal Transport & Dispatch",
+            "contract_start": datetime(2024, 1, 15),
+            "contract_end": datetime(2026, 12, 31),
+            "status": "Flagged",
+            "worker_count": 350,
+            "safety_rating": 3.6,
+            "wage_compliance_pct": 76.5,
+            "epf_esic_compliance_pct": 72.0
+        },
+        {
+            "id": "c-mahanadi-earthmovers",
+            "name": "Mahanadi Earthmovers & Mine Operations",
+            "vendor_code": "VEN-MCL-004",
+            "mine_id": "m-talcher-east",
+            "pan_number": "AAECM3456P",
+            "gstin": "21AAECM3456P1ZX",
+            "category": "Overburden Removal",
+            "contract_start": datetime(2024, 6, 1),
+            "contract_end": datetime(2027, 5, 31),
+            "status": "Compliant",
+            "worker_count": 310,
+            "safety_rating": 4.7,
+            "wage_compliance_pct": 96.0,
+            "epf_esic_compliance_pct": 95.5
+        }
+    ]
+
+    for cdata in contractors_data:
+        existing_c = db.query(Contractor).filter(Contractor.vendor_code == cdata["vendor_code"]).first()
+        if not existing_c:
+            contractor_obj = Contractor(**cdata)
+            db.add(contractor_obj)
+    db.commit()
+
+    # Seed Sample Grievances and Hash-chained Action Logs
+    grievances_data = [
+        {
+            "id": "g-grv-0101",
+            "ticket_id": "GRV-2026-0101",
+            "mine_id": "m-singrauli-north",
+            "contractor_id": "c-singrauli-haulage",
+            "labor_worker_name": "Ramesh Kumar Bisen",
+            "worker_phone": "+91 98271 44520",
+            "is_anonymous": False,
+            "grievance_type": "Delayed Wages",
+            "priority": "High",
+            "status": "Investigating",
+            "description": "Dumper drivers have not received monthly variable dearness allowance (VDA) and overtime arrears for January & February 2026.",
+            "remedial_action_notes": "Notice issued to contractor ledger accountant; payroll records requisitioned.",
+            "assigned_officer": "V. K. Saxena (Labour Enforcement Officer)",
+            "actions": [
+                {
+                    "action": "GRIEVANCE_FILED",
+                    "performed_by": "Ramesh Kumar Bisen",
+                    "notes": "Complaint filed regarding non-payment of VDA and overtime dues."
+                },
+                {
+                    "action": "INVESTIGATION_INITIATED",
+                    "performed_by": "V. K. Saxena",
+                    "notes": "Issued statutory show-cause notice to Singrauli Haulage finance controller."
+                }
+            ]
+        },
+        {
+            "id": "g-grv-0102",
+            "ticket_id": "GRV-2026-0102",
+            "mine_id": "m-jharia-ug",
+            "contractor_id": "c-beml-infra",
+            "labor_worker_name": None,
+            "worker_phone": None,
+            "is_anonymous": True,
+            "grievance_type": "Safety Gear / PPE",
+            "priority": "Critical",
+            "status": "Action Taken",
+            "description": "Workers deployed in underground seam 4 without certified intrinsically safe cap lamps and dust respirators.",
+            "remedial_action_notes": "DGMS safety audit initiated. 150 BIS-certified respirators ordered immediately; contractor penalized ₹50,000.",
+            "assigned_officer": "A. K. Mishra (Deputy Director Mines Safety)",
+            "actions": [
+                {
+                    "action": "GRIEVANCE_FILED",
+                    "performed_by": "Anonymous Laborer",
+                    "notes": "Safety violation report filed via anonymous grievance portal."
+                },
+                {
+                    "action": "PENALTY_ISSUED",
+                    "performed_by": "A. K. Mishra",
+                    "notes": "Assessed ₹50,000 regulatory penalty and mandated immediate replacement of defective safety gear."
+                }
+            ]
+        },
+        {
+            "id": "g-grv-0103",
+            "ticket_id": "GRV-2026-0103",
+            "mine_id": "m-korba-central",
+            "contractor_id": "c-lt-mining",
+            "labor_worker_name": "Sunil Marandi",
+            "worker_phone": "+91 94062 11984",
+            "is_anonymous": False,
+            "grievance_type": "Medical / ESIC",
+            "priority": "Medium",
+            "status": "Resolved",
+            "description": "Discrepancy in ESIC portal registration preventing family from accessing Korba regional hospital benefits.",
+            "remedial_action_notes": "HR portal sync completed. ESIC Pehchan cards issued to worker and dependants.",
+            "assigned_officer": "P. Roy (Welfare Officer)",
+            "actions": [
+                {
+                    "action": "GRIEVANCE_FILED",
+                    "performed_by": "Sunil Marandi",
+                    "notes": "ESIC portal error causing medical cashless denial."
+                },
+                {
+                    "action": "ESIC_SYNC_RESOLVED",
+                    "performed_by": "P. Roy",
+                    "notes": "Aadhaar authentication refreshed and card generated successfully."
+                }
+            ]
+        }
+    ]
+
+    for gdata in grievances_data:
+        existing_g = db.query(LaborGrievance).filter(LaborGrievance.ticket_id == gdata["ticket_id"]).first()
+        if not existing_g:
+            actions = gdata.pop("actions", [])
+            grv = LaborGrievance(**gdata)
+            db.add(grv)
+            db.flush()
+
+            # Generate chained action logs
+            prev_hash = "0" * 64
+            now_dt = datetime.utcnow()
+            for act in actions:
+                raw = f"{prev_hash}:{grv.id}:{act['action']}:{act['performed_by']}:{act['notes']}:{now_dt.isoformat()}"
+                block_hash = hashlib.sha256(raw.encode("utf-8")).hexdigest()
+                log = GrievanceActionLog(
+                    grievance_id=grv.id,
+                    action=act["action"],
+                    performed_by=act["performed_by"],
+                    notes=act["notes"],
+                    previous_hash=prev_hash,
+                    block_hash=block_hash,
+                    created_at=now_dt
+                )
+                db.add(log)
+                prev_hash = block_hash
+    db.commit()
+
+    print(" Database successfully seeded with Indian Coal Mines, sample documents, contractors, and compliance metrics.")
+
