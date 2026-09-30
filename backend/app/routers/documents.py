@@ -64,6 +64,9 @@ async def upload_and_process_document(
     if file_ext == "pdf":
         full_text, page_chunks, is_scanned = DocumentParserService.parse_pdf(saved_filepath)
         file_type = "scanned_pdf" if is_scanned else "pdf"
+    elif file_ext in ["jpg", "jpeg", "png", "webp", "bmp"]:
+        full_text, page_chunks, is_scanned = DocumentParserService.parse_image(saved_filepath)
+        file_type = "scanned_image"
     elif file_ext in ["xlsx", "xls", "csv"]:
         full_text, page_chunks = DocumentParserService.parse_excel(saved_filepath)
         file_type = "xlsx" if file_ext in ["xlsx", "xls"] else "csv"
