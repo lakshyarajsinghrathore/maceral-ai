@@ -29,8 +29,21 @@ if settings.SUPABASE_URL and settings.SUPABASE_KEY:
         print(f"⚠️ Supabase init warning (falling back to SQLite): {e}")
 
 def init_db():
-    """Create tables in local SQLite / PostgreSQL"""
+    """Create tables in local SQLite / PostgreSQL and run safe schema check"""
     Base.metadata.create_all(bind=engine)
+    try:
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            if engine.dialect.name == "postgresql":
+                conn.execute(text("ALTER TABLE document_chunks ADD COLUMN IF NOT EXISTS embedding TEXT;"))
+                conn.commit()
+            elif engine.dialect.name == "sqlite":
+                cols = [row[1] for row in conn.execute(text("PRAGMA table_info(document_chunks);")).fetchall()]
+                if cols and "embedding" not in cols:
+                    conn.execute(text("ALTER TABLE document_chunks ADD COLUMN embedding TEXT;"))
+                    conn.commit()
+    except Exception as e:
+        print(f"[MIGRATION NOTE] Schema check: {e}")
 
 def get_db():
     """FastAPI Dependency for database sessions"""

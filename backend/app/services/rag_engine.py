@@ -5,6 +5,9 @@ from sqlalchemy.orm import Session
 from groq import Groq
 from ..config import settings
 from ..models.db_models import Document, DocumentChunk, QALog
+from .embedding_service import EmbeddingService
+
+embedding_service = EmbeddingService()
 
 STOP_WORDS = {
     "a", "an", "the", "in", "on", "at", "of", "for", "to", "from", "with", "by",
@@ -125,14 +128,12 @@ class CoalGPTRagEngine:
 
     def search_chunks(self, db: Session, query: str, mine_id: str = None, top_k: int = 5) -> List[Tuple[DocumentChunk, Document, float]]:
         """
-        Performs contextual keyword & token matching over document chunks using whole-word boundary matching.
+        Performs hybrid search: semantic vector similarity combined with keyword matching.
         """
-        query_words = [w.lower() for w in re.findall(r"\b[a-zA-Z0-9_-]{2,}\b", query)]
-        query_terms = [w for w in query_words if w not in STOP_WORDS]
-        if not query_terms:
-            return []
+        # 1. Semantic Embedding Search
+        query_embedding = embedding_service.generate_embedding(query)
 
-        # Query all chunks from DB
+        # 2. Hybrid Retrieval: Fetch chunks, calculate similarity, and apply boost
         q = db.query(DocumentChunk, Document).join(Document, DocumentChunk.document_id == Document.id)
         if mine_id:
             q = q.filter((DocumentChunk.mine_id == mine_id) | (Document.mine_id == mine_id))
@@ -140,27 +141,48 @@ class CoalGPTRagEngine:
         results = q.all()
         scored_chunks = []
 
-        for chunk, doc in results:
-            content_lower = chunk.content.lower()
-            title_lower = doc.title.lower()
-            score = 0.0
+        query_words = [w.lower() for w in re.findall(r"\b[a-zA-Z0-9_-]{2,}\b", query)]
+        # Filter stop words to get meaningful query terms
+        query_terms = [w for w in query_words if w not in STOP_WORDS]
 
-            # Whole-word term frequency scoring
-            for term in query_terms:
-                pattern = r"\b" + re.escape(term) + r"\b"
-                matches = len(re.findall(pattern, content_lower))
-                if matches > 0:
-                    score += 2.0 * matches
-                if re.search(pattern, title_lower):
-                    score += 5.0
+        for chunk, doc in results:
+            semantic_score = 0.0
+            if chunk.embedding:
+                try:
+                    sim = embedding_service.calculate_cosine_similarity(query_embedding, chunk.embedding)
+                    semantic_score = max(0.0, float(sim))
+                except Exception:
+                    semantic_score = 0.0
+
+            content_lower = chunk.content.lower()
+            title_lower = doc.title.lower() if doc.title else ""
+
+            # Keyword and domain scoring
+            keyword_score = 0.0
+            if query_terms:
+                for term in query_terms:
+                    pattern = r"\b" + re.escape(term) + r"\b"
+                    matches = len(re.findall(pattern, content_lower))
+                    if matches > 0:
+                        keyword_score += 2.0 * matches
+                    if re.search(pattern, title_lower):
+                        keyword_score += 5.0
 
             # Boost if query asks for metrics and chunk contains domain keywords
             if any(num_word in query.lower() for num_word in ["production", "gcv", "target", "fatal", "ash", "tonne", "pm10", "methane", "ch4"]):
                 if any(kw in content_lower for kw in ["mt", "gcv", "ash", "%", "target", "fatal", "ug/m3", "ch4", "ppm", "stripping"]):
-                    score += 3.0
+                    keyword_score += 3.0
 
-            if score > 0:
-                scored_chunks.append((chunk, doc, score))
+            # Hybrid score blending
+            if keyword_score > 0:
+                final_score = keyword_score + (semantic_score * 3.0)
+            elif semantic_score > 0.35:
+                final_score = semantic_score * 5.0
+            else:
+                final_score = 0.0
+
+            if final_score > 0:
+                scored_chunks.append((chunk, doc, final_score))
 
         # Sort by relevance score descending
         scored_chunks.sort(key=lambda x: x[2], reverse=True)

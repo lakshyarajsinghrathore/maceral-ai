@@ -4,6 +4,9 @@ from sqlalchemy.orm import Session
 from app.models.db_models import Mine, Document, DocumentChunk, ExtractedData, ComplianceScore, Alert, Report, User
 from app.services.report_generator import ReportGeneratorService
 from app.services.auth_service import hash_password
+from app.services.embedding_service import EmbeddingService
+
+embedding_service = EmbeddingService()
 
 MINES_SEED = [
     {
@@ -536,6 +539,7 @@ def seed_database(db: Session):
                     page_number=ch["page"],
                     section_title=ch["section"],
                     content=ch["text"],
+                    embedding=embedding_service.generate_embedding(ch["text"]),
                     metadata_json={"source": doc_info["title"]}
                 )
                 db.add(chunk_obj)

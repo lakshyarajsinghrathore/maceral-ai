@@ -7,6 +7,7 @@ import {
   FileSpreadsheet,
   ShieldAlert,
   MapPin,
+  Users,
   X
 } from 'lucide-react';
 
@@ -35,6 +36,11 @@ const NAV_ITEMS = [
     to: '/compliance',
     label: 'Compliance & Alerts',
     icon: ShieldAlert,
+  },
+  {
+    to: '/contractors',
+    label: 'Contractors & Audit Log',
+    icon: Users,
   },
   {
     to: '/inspection',

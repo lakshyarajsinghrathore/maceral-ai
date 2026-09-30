@@ -12,38 +12,35 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png',
 });
 
-// Create self-contained SVG pins for compliance status (no external image CDN dependency)
-const createIcon = (color) => {
-  const colorMap = {
-    green: '#10B981',
-    amber: '#F59E0B',
-    red: '#EF4444',
-    blue: '#3B82F6'
-  };
-  const hex = colorMap[color] || '#3B82F6';
-
-  return L.divIcon({
-    className: 'custom-mine-pin',
-    html: `
-      <div style="position: relative; width: 28px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-        <svg viewBox="0 0 24 32" width="28" height="36" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
-          <path d="M12 0C5.37 0 0 5.37 0 12c0 8.5 12 20 12 20s12-11.5 12-20c0-6.63-5.37-12-12-12z" fill="${hex}" stroke="#FFFFFF" stroke-width="1.5" />
-          <circle cx="12" cy="11" r="5" fill="#FFFFFF" />
-          <circle cx="12" cy="11" r="3" fill="${hex}" />
-        </svg>
-      </div>
-    `,
-    iconSize: [28, 36],
-    iconAnchor: [14, 36],
-    popupAnchor: [0, -36]
+// Create custom SVG div icons for compliance status (bypasses CDN/CORS issues)
+const createIcon = (colorCode) => {
+  return new L.divIcon({
+    className: 'bg-transparent border-0',
+    html: `<div style="
+            background-color: ${colorCode};
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50% 50% 50% 0;
+            border: 3px solid white;
+            transform: rotate(-45deg);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+           ">
+            <div style="transform: rotate(45deg); width: 10px; height: 10px; background-color: white; border-radius: 50%;"></div>
+           </div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 28],
+    popupAnchor: [0, -32]
   });
 };
 
 const icons = {
-  green: createIcon('green'),
-  amber: createIcon('amber'),
-  red: createIcon('red'),
-  blue: createIcon('blue')
+  green: createIcon('#10B981'), // Emerald 500
+  amber: createIcon('#F59E0B'), // Amber 500
+  red: createIcon('#EF4444'),   // Red 500
+  blue: createIcon('#3B82F6')   // Blue 500
 };
 
 export default function GISMap({ mines = [], scores = [], alerts = [] }) {

@@ -11,9 +11,11 @@ from ..models.schemas import DocumentResponse, ExtractedDataResponse
 from ..services.ocr_parser import DocumentParserService
 from ..services.groq_extractor import GroqExtractionService
 from ..services.compliance_engine import ComplianceEngineService
+from ..services.embedding_service import EmbeddingService
 
 router = APIRouter(prefix="/api/documents", tags=["Documents & Extraction"])
 groq_service = GroqExtractionService()
+embedding_service = EmbeddingService()
 
 @router.post("/upload", response_model=DocumentResponse)
 async def upload_and_process_document(
@@ -98,6 +100,9 @@ async def upload_and_process_document(
 
     # 4. Save Chunks
     for chunk in chunk_records:
+        # Generate embedding for the chunk
+        embedding = embedding_service.generate_embedding(chunk["content"])
+
         c_obj = DocumentChunk(
             document_id=doc_record.id,
             mine_id=mine_id,
@@ -105,6 +110,7 @@ async def upload_and_process_document(
             page_number=chunk["page_number"],
             section_title=chunk.get("section_title", f"Page {chunk['page_number']}"),
             content=chunk["content"],
+            embedding=embedding,
             metadata_json=chunk.get("metadata", {})
         )
         db.add(c_obj)

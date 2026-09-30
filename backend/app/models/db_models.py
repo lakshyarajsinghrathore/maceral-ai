@@ -3,7 +3,26 @@ from datetime import datetime
 from sqlalchemy import (
     Column, String, Text, Integer, Float, Boolean, DateTime, ForeignKey, JSON
 )
+from sqlalchemy.types import TypeDecorator
 from sqlalchemy.orm import declarative_base, relationship
+import json
+
+# Vector type support (for pgvector)
+class Vector(TypeDecorator):
+    impl = Text
+    cache_ok = True
+    def process_bind_param(self, value, dialect):
+        return json.dumps(value) if value is not None else None
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return None
+        if isinstance(value, list):
+            return value
+        try:
+            return json.loads(value)
+        except Exception:
+            return None
+
 
 Base = declarative_base()
 
@@ -97,6 +116,7 @@ class DocumentChunk(Base):
     page_number = Column(Integer, default=1)
     section_title = Column(String(255), nullable=True)
     content = Column(Text, nullable=False)
+    embedding = Column(Vector, nullable=True)  # Store vector embedding
     metadata_json = Column(JSON, default=dict)
     created_at = Column(DateTime, default=datetime.utcnow)
 

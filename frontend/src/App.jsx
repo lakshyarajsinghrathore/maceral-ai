@@ -8,6 +8,7 @@ import CoalGPT from './pages/CoalGPT';
 import ReportGenerator from './pages/ReportGenerator';
 import ComplianceOverview from './pages/ComplianceOverview';
 import MobileInspection from './pages/MobileInspection';
+import ContractorsAudit from './pages/ContractorsAudit';
 import AuthPage from './pages/AuthPage';
 
 // Protected layout wrapper containing Dashboard Navbar and Sidebar
@@ -51,6 +52,7 @@ export default function App() {
           <Route path="/coalgpt" element={<CoalGPT />} />
           <Route path="/reports" element={<ReportGenerator />} />
           <Route path="/compliance" element={<ComplianceOverview />} />
+          <Route path="/contractors" element={<ContractorsAudit />} />
           <Route path="/inspection" element={<MobileInspection />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
