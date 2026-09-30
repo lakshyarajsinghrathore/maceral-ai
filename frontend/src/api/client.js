@@ -19,6 +19,21 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Reject HTML responses (when SPA catch-all rewrites /api/* to index.html)
+api.interceptors.response.use(
+  (response) => {
+    if (
+      typeof response.data === 'string' &&
+      (response.data.trim().toLowerCase().startsWith('<!doctype') ||
+        response.data.trim().toLowerCase().startsWith('<html'))
+    ) {
+      return Promise.reject(new Error('Received HTML response instead of JSON from API'));
+    }
+    return response;
+  },
+  (error) => Promise.reject(error)
+);
+
 // Helper for static file & generated report downloads in local or cloud environments
 export const getFileUrl = (path) => {
   if (!path) return '';

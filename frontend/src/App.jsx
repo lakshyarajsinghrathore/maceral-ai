@@ -11,6 +11,45 @@ import MobileInspection from './pages/MobileInspection';
 import ContractorsAudit from './pages/ContractorsAudit';
 import AuthPage from './pages/AuthPage';
 
+// Resilient Error Boundary to prevent any sub-route error from blanking out the app layout
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('[Maceral AI] Route render error caught by boundary:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-8 max-w-xl mx-auto my-12 bg-white rounded-2xl border border-red-200 shadow-sm text-center">
+          <div className="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 font-bold text-lg">
+            !
+          </div>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">Notice: Component Reload Needed</h3>
+          <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+            A temporary component error occurred while rendering this view. You can reload this view or navigate to other tabs using the sidebar.
+          </p>
+          <button
+            onClick={() => this.setState({ hasError: false })}
+            className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors"
+          >
+            Retry Loading View
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 // Protected layout wrapper containing Dashboard Navbar and Sidebar
 function ProtectedLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -34,7 +73,9 @@ function ProtectedLayout() {
         )}
 
         <main className="flex-1 overflow-y-auto bg-[#F5F3EE] w-full">
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
     </div>
