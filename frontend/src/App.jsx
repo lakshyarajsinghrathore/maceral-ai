@@ -84,20 +84,22 @@ function ProtectedLayout() {
 
 export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<AuthPage />} />
-        <Route element={<ProtectedLayout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/documents" element={<DocumentIntelligence />} />
-          <Route path="/coalgpt" element={<CoalGPT />} />
-          <Route path="/reports" element={<ReportGenerator />} />
-          <Route path="/compliance" element={<ComplianceOverview />} />
-          <Route path="/contractors" element={<ContractorsAudit />} />
-          <Route path="/inspection" element={<MobileInspection />} />
-        </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<AuthPage />} />
+          <Route element={<ProtectedLayout />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/documents" element={<DocumentIntelligence />} />
+            <Route path="/coalgpt" element={<CoalGPT />} />
+            <Route path="/reports" element={<ReportGenerator />} />
+            <Route path="/compliance" element={<ComplianceOverview />} />
+            <Route path="/contractors" element={<ContractorsAudit />} />
+            <Route path="/inspection" element={<MobileInspection />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Router>
+    </ErrorBoundary>
   );
 }
