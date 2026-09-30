@@ -30,6 +30,15 @@ L.Icon.Default.mergeOptions({
 // Helper component for smooth programmatic camera flying
 function MapFlyToController({ targetCoords, targetZoom }) {
   const map = useMap();
+
+  useEffect(() => {
+    // Invalidate size on mount to ensure Leaflet calculates accurate coordinates under any scale
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [map]);
+
   useEffect(() => {
     if (targetCoords && targetCoords.length === 2) {
       map.flyTo(targetCoords, targetZoom || 13, { duration: 1.5 });
