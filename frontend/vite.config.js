@@ -14,6 +14,15 @@ export default defineConfig({
         short_name: 'Maceral',
         description: 'Geo-Tagged Field Reporting and Compliance for Coal Mines',
         theme_color: '#0f172a',
+        background_color: '#F5F3EE',
+        display: 'standalone',
+        orientation: 'portrait-primary',
+        categories: ['productivity', 'business', 'utilities'],
+        dir: 'ltr',
+        lang: 'en-US',
+        id: '/',
+        start_url: '/',
+        scope: '/',
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -25,6 +34,20 @@ export default defineConfig({
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
+          }
+        ],
+        screenshots: [
+          {
+            src: 'screenshot-desktop.jpg',
+            sizes: '1280x720',
+            type: 'image/jpeg',
+            form_factor: 'wide'
+          },
+          {
+            src: 'screenshot-mobile.jpg',
+            sizes: '720x1280',
+            type: 'image/jpeg',
+            form_factor: 'narrow'
           }
         ]
       },
