@@ -1,5 +1,9 @@
 import https from 'node:https';
 
+// In-memory cache for ultra-fast (0ms) repeat responses
+const chunkCache = new Map();
+const MAX_CACHE_SIZE = 250;
+
 function cleanText(text) {
   if (!text || typeof text !== 'string') return '';
 
@@ -25,11 +29,11 @@ function cleanText(text) {
   t = t.replace(/_(.*?)_/g, '$1');
 
   // 6. Remove Markdown table syntax: table dividers and column pipes
-  t = t.replace(/\|[-:\s|]+\|/g, '');
+  t = t.replace(new RegExp('\\|[\\-:\\s\\|]+\\|', 'g'), '');
   t = t.replace(/\|/g, ', ');
 
   // 7. Remove list bullets at start of lines (*, -, +, •)
-  t = t.replace(/^[\s*•\-+]+/gm, '');
+  t = t.replace(new RegExp('^[\\s*•\\-+]+', 'gm'), '');
 
   // 8. Remove blockquote markers (> Quote -> Quote)
   t = t.replace(/^>\s*/gm, '');
@@ -38,11 +42,11 @@ function cleanText(text) {
   try {
     t = t.replace(/\p{Extended_Pictographic}/gu, '');
   } catch (e) {}
-  t = t.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '');
-  t = t.replace(/[\u200B-\u200D\uFE00-\uFE0F\u2600-\u27BF\u2B50-\u2B55\u2300-\u23FF\u25A0-\u25FF\uE000-\uF8FF]/g, '');
+  t = t.replace(new RegExp('[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]', 'g'), '');
+  t = t.replace(new RegExp('[\\u200B-\\u200D\\uFE00-\\uFE0F\\u2600-\\u27BF\\u2B50-\\u2B55\\u2300-\\u23FF\\u25A0-\\u25FF\\uE000-\\uF8FF]', 'g'), '');
 
   // 10. Remove non-major decorative symbols while preserving cadence and legitimate numbers/units
-  t = t.replace(/[@#^&*~_<>{}\[\]()\\/=+`"\'~_•◦▪–—]/g, ' ');
+  t = t.replace(new RegExp('[@#^&*~_<>{}\\[\\]()\\\\/=+`"\'~_•◦▪–—]', 'g'), ' ');
 
   // 11. Normalize multiple punctuation
   t = t.replace(/\.{2,}/g, '.');
@@ -78,6 +82,21 @@ function fetchTTSChunk(textChunk, langCode) {
       res.on('data', (c) => data.push(c));
       res.on('end', () => resolve(Buffer.concat(data)));
     }).on('error', reject);
+  });
+}
+
+function getCachedOrFetch(chunk, langCode) {
+  const key = `${langCode}:${chunk}`;
+  if (chunkCache.has(key)) {
+    return Promise.resolve(chunkCache.get(key));
+  }
+  return fetchTTSChunk(chunk, langCode).then((buf) => {
+    if (chunkCache.size >= MAX_CACHE_SIZE) {
+      const firstKey = chunkCache.keys().next().value;
+      if (firstKey) chunkCache.delete(firstKey);
+    }
+    chunkCache.set(key, buf);
+    return buf;
   });
 }
 
@@ -144,14 +163,14 @@ export default async function handler(req, res) {
 
     const activeChunks = chunks.slice(0, 8);
     const audioBuffers = await Promise.all(
-      activeChunks.map((chunk) => fetchTTSChunk(chunk, langCode))
+      activeChunks.map((chunk) => getCachedOrFetch(chunk, langCode))
     );
 
     const fullAudio = Buffer.concat(audioBuffers);
 
     res.setHeader('Content-Type', 'audio/mpeg');
     res.setHeader('Content-Length', fullAudio.length);
-    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
     return res.status(200).send(fullAudio);
   } catch (error) {
     console.error('TTS handler error:', error);

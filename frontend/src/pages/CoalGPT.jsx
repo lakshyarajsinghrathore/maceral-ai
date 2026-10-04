@@ -108,13 +108,17 @@ export default function CoalGPT() {
   const [language, setLanguage] = useState('English');
   const [isListening, setIsListening] = useState(false);
   const [playingTTSId, setPlayingTTSId] = useState(null);
+  const [loadingTTSId, setLoadingTTSId] = useState(null);
   const [availableVoices, setAvailableVoices] = useState([]);
   const [mines, setMines] = useState([]);
   const messagesEndRef = useRef(null);
   const currentAudioRef = useRef(null);
   const currentAudioUrlRef = useRef(null);
+  const audioCacheRef = useRef(new Map());
+  const playbackSessionRef = useRef(0);
 
   const stopCurrentAudio = () => {
+    playbackSessionRef.current += 1;
     if (currentAudioRef.current) {
       try {
         currentAudioRef.current.pause();
@@ -136,6 +140,7 @@ export default function CoalGPT() {
       window.speechSynthesis.cancel();
     }
     setPlayingTTSId(null);
+    setLoadingTTSId(null);
   };
 
   // Load and pre-fetch modern Neural Natural voices
@@ -329,9 +334,62 @@ export default function CoalGPT() {
     return t.trim();
   };
 
+  // Splits sanitized text into natural sentence-sized units for streaming queue playback
+  const splitIntoSpeechSentences = (text) => {
+    if (!text || typeof text !== 'string') return [];
+
+    // Protect decimals (e.g. 15.4 MT) from being split as sentence terminators
+    const normalized = text.replace(/(\d+)\.(\d+)/g, (m, a, b) => a + '<DOT>' + b);
+
+    // Split on sentence terminators: . ! ? । ॥ ; or newlines
+    const rawSegments = (normalized.match(/[^.!?।॥;\n]+(?:[.!?।॥;\n]+|$)/g) || [normalized])
+      .map(s => s.replace(/<DOT>/g, '.').trim())
+      .filter(Boolean);
+
+    const sentences = [];
+    for (const seg of rawSegments) {
+      // If a segment is exceptionally long (> 220 chars), split at commas for natural pauses
+      if (seg.length > 220) {
+        const parts = (seg.match(/[^,]+(?:,+|$)/g) || [seg]).map(p => p.trim()).filter(Boolean);
+        let buf = '';
+        for (const p of parts) {
+          if (!buf) {
+            buf = p;
+          } else if ((buf + ' ' + p).length <= 200) {
+            buf += ' ' + p;
+          } else {
+            sentences.push(buf);
+            buf = p;
+          }
+        }
+        if (buf) sentences.push(buf);
+      } else {
+        sentences.push(seg);
+      }
+    }
+
+    // Merge tiny fragments (< 12 chars, e.g. "1.", "Yes.") with next sentence
+    const merged = [];
+    let buffer = '';
+    for (const s of sentences) {
+      if (!buffer) {
+        buffer = s;
+      } else if (buffer.length < 12) {
+        buffer += ' ' + s;
+      } else {
+        merged.push(buffer);
+        buffer = s;
+      }
+    }
+    if (buffer) merged.push(buffer);
+
+    return merged.length > 0 ? merged : [text.trim()];
+  };
+
   const fallbackSpeechSynthesis = (msgId, cleanText) => {
     if (!('speechSynthesis' in window)) {
       setPlayingTTSId(null);
+      setLoadingTTSId(null);
       return;
     }
     try {
@@ -359,22 +417,26 @@ export default function CoalGPT() {
 
       utterance.onend = () => {
         setPlayingTTSId(null);
+        setLoadingTTSId(null);
       };
       utterance.onerror = () => {
         setPlayingTTSId(null);
+        setLoadingTTSId(null);
       };
 
+      setLoadingTTSId(null);
       setPlayingTTSId(msgId);
       window.speechSynthesis.speak(utterance);
     } catch (e) {
       console.warn("Fallback speech synthesis error:", e);
       setPlayingTTSId(null);
+      setLoadingTTSId(null);
     }
   };
 
   const playTTS = async (msgId, text) => {
-    // Toggle: if currently speaking this message, stop immediately
-    if (playingTTSId === msgId) {
+    // Toggle: if currently speaking or loading this message, stop immediately
+    if (playingTTSId === msgId || loadingTTSId === msgId) {
       stopCurrentAudio();
       return;
     }
@@ -384,34 +446,98 @@ export default function CoalGPT() {
 
     // Strip emojis, markdown, and non-major symbols for clean, natural speech
     const cleanText = cleanSpeechText(text);
-
     if (!cleanText) return;
 
-    setPlayingTTSId(msgId);
+    const sentences = splitIntoSpeechSentences(cleanText);
+    if (!sentences || sentences.length === 0) return;
+
+    // Start loading indicator and register new playback session ID
+    setLoadingTTSId(msgId);
+    playbackSessionRef.current += 1;
+    const currentSession = playbackSessionRef.current;
+
+    // Helper to fetch a single sentence blob with in-memory caching
+    const fetchSentenceBlob = async (sentence) => {
+      const cacheKey = `${language}:${sentence}`;
+      if (audioCacheRef.current.has(cacheKey)) {
+        return audioCacheRef.current.get(cacheKey);
+      }
+      const blob = await streamSpeechAudio(sentence, language);
+      audioCacheRef.current.set(cacheKey, blob);
+      return blob;
+    };
+
+    // Step 1: Immediately request Sentence 0 for fast-path sub-second response (~150-250ms)
+    const firstPromise = fetchSentenceBlob(sentences[0]);
+
+    // Step 2: Concurrently kick off background prefetch for remaining sentences
+    const remainingPromises = sentences.slice(1).map(s => fetchSentenceBlob(s));
+    const allSentencePromises = [firstPromise, ...remainingPromises];
 
     try {
-      // Primary: Ultra-realistic Microsoft Azure Neural audio stream
-      const blob = await streamSpeechAudio(cleanText, language);
-      const audioUrl = URL.createObjectURL(blob);
-      currentAudioUrlRef.current = audioUrl;
+      // Await only the first sentence to start speaking immediately
+      await firstPromise;
 
-      const audio = new Audio(audioUrl);
-      currentAudioRef.current = audio;
+      // Abort if session was stopped or switched while downloading first sentence
+      if (playbackSessionRef.current !== currentSession) return;
 
-      // Strictly play ONCE and clear state when finished
-      audio.onended = () => {
-        stopCurrentAudio();
+      // Transition UI from loading spinner to active audio pulse
+      setLoadingTTSId(null);
+      setPlayingTTSId(msgId);
+
+      // Play each sentence in the queue sequentially without gaps
+      const playQueueIndex = async (index) => {
+        if (playbackSessionRef.current !== currentSession) return;
+
+        if (index >= sentences.length) {
+          // Playback completed for all sentences
+          stopCurrentAudio();
+          return;
+        }
+
+        try {
+          const blob = await allSentencePromises[index];
+          if (playbackSessionRef.current !== currentSession) return;
+
+          // Revoke previous audio object URL to prevent memory leaks
+          if (currentAudioUrlRef.current) {
+            try { URL.revokeObjectURL(currentAudioUrlRef.current); } catch (e) {}
+          }
+
+          const audioUrl = URL.createObjectURL(blob);
+          currentAudioUrlRef.current = audioUrl;
+
+          const audio = new Audio(audioUrl);
+          currentAudioRef.current = audio;
+
+          // Strictly play each sentence ONCE and advance queue on completion
+          audio.onended = () => {
+            if (playbackSessionRef.current !== currentSession) return;
+            playQueueIndex(index + 1);
+          };
+
+          audio.onerror = (err) => {
+            console.warn(`Sentence ${index} playback error, advancing to next:`, err);
+            if (playbackSessionRef.current !== currentSession) return;
+            playQueueIndex(index + 1);
+          };
+
+          await audio.play();
+        } catch (err) {
+          console.warn(`Error streaming sentence ${index}, advancing:`, err);
+          if (playbackSessionRef.current !== currentSession) return;
+          playQueueIndex(index + 1);
+        }
       };
-      audio.onerror = (err) => {
-        console.warn("Audio playback error, falling back to Web Speech API", err);
-        stopCurrentAudio();
-        fallbackSpeechSynthesis(msgId, cleanText);
-      };
 
-      await audio.play();
+      await playQueueIndex(0);
+
     } catch (err) {
       console.warn("Neural audio streaming unavailable, falling back to Web Speech API", err);
-      fallbackSpeechSynthesis(msgId, cleanText);
+      if (playbackSessionRef.current === currentSession) {
+        setLoadingTTSId(null);
+        fallbackSpeechSynthesis(msgId, cleanText);
+      }
     }
   };
 
@@ -799,11 +925,23 @@ export default function CoalGPT() {
                           className={`ml-2 transition-colors ${
                             playingTTSId === (m.id || 'welcome')
                               ? 'text-blue-600 animate-pulse'
+                              : loadingTTSId === (m.id || 'welcome')
+                              ? 'text-blue-600'
                               : 'text-gray-400 hover:text-blue-600'
                           }`}
-                          title={playingTTSId === (m.id || 'welcome') ? "Stop audio" : "Read aloud (once)"}
+                          title={
+                            playingTTSId === (m.id || 'welcome')
+                              ? "Stop audio"
+                              : loadingTTSId === (m.id || 'welcome')
+                              ? "Preparing voice..."
+                              : "Read aloud (once)"
+                          }
                         >
-                          <Volume2 className="h-3.5 w-3.5" />
+                          {loadingTTSId === (m.id || 'welcome') ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-600" />
+                          ) : (
+                            <Volume2 className="h-3.5 w-3.5" />
+                          )}
                         </button>
                       </>
                     )}

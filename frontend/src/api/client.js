@@ -84,28 +84,30 @@ export const fetchQAHistory = async () => {
 };
 
 export const streamSpeechAudio = async (text, language = 'English') => {
+  // Fast Path: Direct call to same-origin /api/speak (sub-200ms edge audio)
   try {
-    const response = await api.post(
-      '/api/qa/speak',
-      { text, language },
-      { responseType: 'blob' }
-    );
-    if (response.data && response.data.type && response.data.type.includes('html')) {
-      throw new Error('Received HTML instead of audio from primary backend');
-    }
-    return response.data;
-  } catch (err) {
-    console.warn('Primary backend TTS failed or updating, falling back to Vercel audio endpoint...', err);
-    const fallbackResponse = await axios.post(
+    const edgeResponse = await axios.post(
       '/api/speak',
       { text, language },
-      { responseType: 'blob' }
+      { responseType: 'blob', timeout: 5000 }
     );
-    if (fallbackResponse.data && fallbackResponse.data.type && fallbackResponse.data.type.includes('html')) {
-      throw new Error('Received HTML from /api/speak fallback');
+    if (edgeResponse.data && edgeResponse.data.type && !edgeResponse.data.type.includes('html')) {
+      return edgeResponse.data;
     }
-    return fallbackResponse.data;
+  } catch (err) {
+    console.warn('Fast edge TTS unavailable, falling back to backend router...', err);
   }
+
+  // Fallback: Primary backend /api/qa/speak
+  const backendResponse = await api.post(
+    '/api/qa/speak',
+    { text, language },
+    { responseType: 'blob', timeout: 8000 }
+  );
+  if (backendResponse.data && backendResponse.data.type && backendResponse.data.type.includes('html')) {
+    throw new Error('Received HTML instead of audio from primary backend');
+  }
+  return backendResponse.data;
 };
 
 // Ministry Reports API
