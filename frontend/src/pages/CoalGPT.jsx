@@ -108,17 +108,98 @@ export default function CoalGPT() {
   const [language, setLanguage] = useState('English');
   const [isListening, setIsListening] = useState(false);
   const [playingTTSId, setPlayingTTSId] = useState(null);
+  const [availableVoices, setAvailableVoices] = useState([]);
   const [mines, setMines] = useState([]);
   const messagesEndRef = useRef(null);
 
-  // Stop any active speech if user navigates away
+  // Load and pre-fetch modern Neural Natural voices
   useEffect(() => {
+    if ('speechSynthesis' in window) {
+      const loadVoices = () => {
+        const v = window.speechSynthesis.getVoices();
+        if (v && v.length > 0) {
+          setAvailableVoices(v);
+        }
+      };
+      loadVoices();
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
     return () => {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
     };
   }, []);
+
+  // Selector for human-sounding Neural Natural voice packs
+  const getBestVoice = (lang, voicesList) => {
+    if (!voicesList || voicesList.length === 0) return null;
+
+    if (lang === 'Hindi') {
+      // 1. Swara / Madhur Natural
+      const topNatural = voicesList.find(v => 
+        (v.name.includes('Swara') || v.name.includes('Madhur')) && v.lang.startsWith('hi')
+      );
+      if (topNatural) return topNatural;
+
+      // 2. Any Online/Natural Hindi voice
+      const naturalHi = voicesList.find(v => 
+        v.lang.startsWith('hi') && (v.name.toLowerCase().includes('natural') || v.name.toLowerCase().includes('online'))
+      );
+      if (naturalHi) return naturalHi;
+
+      // 3. Google Hindi
+      const googleHi = voicesList.find(v => v.lang.startsWith('hi') && v.name.includes('Google'));
+      if (googleHi) return googleHi;
+
+      return voicesList.find(v => v.lang.startsWith('hi')) || null;
+    }
+
+    if (lang === 'Bengali') {
+      // 1. Tanishaa / Bashkar Natural
+      const topNatural = voicesList.find(v => 
+        (v.name.includes('Tanishaa') || v.name.includes('Bashkar')) && v.lang.startsWith('bn')
+      );
+      if (topNatural) return topNatural;
+
+      // 2. Any Online/Natural Bengali voice
+      const naturalBn = voicesList.find(v => 
+        v.lang.startsWith('bn') && (v.name.toLowerCase().includes('natural') || v.name.toLowerCase().includes('online'))
+      );
+      if (naturalBn) return naturalBn;
+
+      // 3. Google Bengali
+      const googleBn = voicesList.find(v => v.lang.startsWith('bn') && v.name.includes('Google'));
+      if (googleBn) return googleBn;
+
+      return voicesList.find(v => v.lang.startsWith('bn')) || null;
+    }
+
+    // Default: English (India)
+    // 1. Neerja / Prabhat Natural (Indian English)
+    const topNatural = voicesList.find(v => 
+      (v.name.includes('Neerja') || v.name.includes('Prabhat')) && (v.lang === 'en-IN' || v.lang.startsWith('en'))
+    );
+    if (topNatural) return topNatural;
+
+    // 2. Indian English Natural/Online
+    const naturalEnIn = voicesList.find(v => 
+      (v.lang === 'en-IN' || v.lang === 'en_IN') && (v.name.toLowerCase().includes('natural') || v.name.toLowerCase().includes('online'))
+    );
+    if (naturalEnIn) return naturalEnIn;
+
+    // 3. Any Indian English voice (Heera, Ravi)
+    const anyEnIn = voicesList.find(v => v.lang === 'en-IN' || v.lang === 'en_IN');
+    if (anyEnIn) return anyEnIn;
+
+    // 4. Natural English (Jenny Natural, Ryan Natural, Google UK Female)
+    const naturalEn = voicesList.find(v => 
+      v.lang.startsWith('en') && (v.name.toLowerCase().includes('natural') || v.name.toLowerCase().includes('online') || v.name.includes('Google'))
+    );
+    if (naturalEn) return naturalEn;
+
+    return voicesList.find(v => v.lang.startsWith('en')) || null;
+  };
 
   const toggleListening = () => {
     if (isListening) {
@@ -180,7 +261,22 @@ export default function CoalGPT() {
     if (!cleanText) return;
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = language === 'Hindi' ? 'hi-IN' : language === 'Bengali' ? 'bn-IN' : 'en-IN';
+
+    // Bind human neural natural voice
+    const currentVoices = window.speechSynthesis.getVoices();
+    const candidateVoices = currentVoices.length > 0 ? currentVoices : availableVoices;
+    const bestVoice = getBestVoice(language, candidateVoices);
+
+    if (bestVoice) {
+      utterance.voice = bestVoice;
+      utterance.lang = bestVoice.lang;
+    } else {
+      utterance.lang = language === 'Hindi' ? 'hi-IN' : language === 'Bengali' ? 'bn-IN' : 'en-IN';
+    }
+
+    // Natural human cadence
+    utterance.rate = 0.98;
+    utterance.pitch = 1.0;
 
     // Strictly play ONCE and clear state when finished
     utterance.onend = () => {
