@@ -1,8 +1,16 @@
+import { EdgeTTS } from 'edge-tts-universal';
 import https from 'node:https';
 
 // In-memory cache for ultra-fast (0ms) repeat responses
 const chunkCache = new Map();
-const MAX_CACHE_SIZE = 250;
+const MAX_CACHE_SIZE = 300;
+
+// Authentic Human Microsoft Azure Neural Voice packs (Natural speech with cadence & breathing)
+const VOICE_MAP = {
+  Hindi: 'hi-IN-SwaraNeural',
+  Bengali: 'bn-IN-TanishaaNeural',
+  English: 'en-IN-NeerjaNeural',
+};
 
 function cleanText(text) {
   if (!text || typeof text !== 'string') return '';
@@ -71,12 +79,37 @@ function cleanText(text) {
   return t.trim();
 }
 
-function fetchTTSChunk(textChunk, langCode) {
+async function synthesizeNeuralChunk(textChunk, voice) {
+  const cacheKey = `${voice}:${textChunk}`;
+  if (chunkCache.has(cacheKey)) {
+    return chunkCache.get(cacheKey);
+  }
+
+  try {
+    const tts = new EdgeTTS(textChunk, voice, { rate: '-2%' });
+    const result = await tts.synthesize();
+    const arrayBuf = await result.audio.arrayBuffer();
+    const buf = Buffer.from(arrayBuf);
+
+    if (chunkCache.size >= MAX_CACHE_SIZE) {
+      const firstKey = chunkCache.keys().next().value;
+      if (firstKey) chunkCache.delete(firstKey);
+    }
+    chunkCache.set(cacheKey, buf);
+    return buf;
+  } catch (err) {
+    console.warn(`EdgeTTS synthesis failed for voice ${voice}, falling back to translate TTS:`, err);
+    const langCode = voice.startsWith('hi') ? 'hi' : voice.startsWith('bn') ? 'bn' : 'en';
+    return fetchFallbackChunk(textChunk, langCode);
+  }
+}
+
+function fetchFallbackChunk(textChunk, langCode) {
   return new Promise((resolve, reject) => {
     const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(textChunk)}&tl=${langCode}&client=tw-ob`;
     https.get(url, (res) => {
       if (res.statusCode !== 200) {
-        return reject(new Error(`TTS chunk failed: ${res.statusCode}`));
+        return reject(new Error(`TTS fallback failed: ${res.statusCode}`));
       }
       const data = [];
       res.on('data', (c) => data.push(c));
@@ -85,29 +118,18 @@ function fetchTTSChunk(textChunk, langCode) {
   });
 }
 
-function getCachedOrFetch(chunk, langCode) {
-  const key = `${langCode}:${chunk}`;
-  if (chunkCache.has(key)) {
-    return Promise.resolve(chunkCache.get(key));
-  }
-  return fetchTTSChunk(chunk, langCode).then((buf) => {
-    if (chunkCache.size >= MAX_CACHE_SIZE) {
-      const firstKey = chunkCache.keys().next().value;
-      if (firstKey) chunkCache.delete(firstKey);
-    }
-    chunkCache.set(key, buf);
-    return buf;
-  });
-}
+function splitIntoChunks(text, maxLength = 200) {
+  const normalized = text.replace(/(\d+)\.(\d+)/g, (m, a, b) => a + '<DOT>' + b);
+  const sentences = (normalized.match(/[^.!?।॥;\n]+(?:[.!?।॥;\n]+|$)/g) || [normalized])
+    .map(s => s.replace(/<DOT>/g, '.').trim())
+    .filter(Boolean);
 
-function splitIntoChunks(text, maxLength = 180) {
-  const sentences = text.match(/[^.!?।\n]+[.!?।\n]*/g) || [text];
   const chunks = [];
   let current = '';
 
   for (const s of sentences) {
-    if ((current + s).length <= maxLength) {
-      current += s;
+    if ((current + ' ' + s).trim().length <= maxLength) {
+      current = (current ? current + ' ' : '') + s;
     } else {
       if (current.trim()) chunks.push(current.trim());
       if (s.length > maxLength) {
@@ -158,12 +180,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Text is required' });
     }
 
-    const langCode = language === 'Hindi' ? 'hi' : language === 'Bengali' ? 'bn' : 'en-IN';
-    const chunks = splitIntoChunks(cleaned, 180);
+    const voice = VOICE_MAP[language] || VOICE_MAP['English'];
+    const chunks = splitIntoChunks(cleaned, 200);
 
     const activeChunks = chunks.slice(0, 8);
     const audioBuffers = await Promise.all(
-      activeChunks.map((chunk) => getCachedOrFetch(chunk, langCode))
+      activeChunks.map((chunk) => synthesizeNeuralChunk(chunk, voice))
     );
 
     const fullAudio = Buffer.concat(audioBuffers);
@@ -173,7 +195,7 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
     return res.status(200).send(fullAudio);
   } catch (error) {
-    console.error('TTS handler error:', error);
-    return res.status(500).json({ error: 'TTS generation failed', details: error.message });
+    console.error('Neural TTS handler error:', error);
+    return res.status(500).json({ error: 'Neural TTS generation failed', details: error.message });
   }
 }
