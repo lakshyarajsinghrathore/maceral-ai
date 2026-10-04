@@ -13,7 +13,7 @@ import {
   Mic,
   Volume2
 } from 'lucide-react';
-import { askCoalGPT, fetchMines } from '../api/client';
+import { askCoalGPT, fetchMines, streamSpeechAudio } from '../api/client';
 import CitationBadge from '../components/CitationBadge';
 
 const PRE_CANNED_QUESTIONS = [
@@ -111,6 +111,32 @@ export default function CoalGPT() {
   const [availableVoices, setAvailableVoices] = useState([]);
   const [mines, setMines] = useState([]);
   const messagesEndRef = useRef(null);
+  const currentAudioRef = useRef(null);
+  const currentAudioUrlRef = useRef(null);
+
+  const stopCurrentAudio = () => {
+    if (currentAudioRef.current) {
+      try {
+        currentAudioRef.current.pause();
+        currentAudioRef.current.currentTime = 0;
+      } catch (e) {
+        console.warn("Audio pause error:", e);
+      }
+      currentAudioRef.current = null;
+    }
+    if (currentAudioUrlRef.current) {
+      try {
+        URL.revokeObjectURL(currentAudioUrlRef.current);
+      } catch (e) {
+        console.warn("Revoke URL error:", e);
+      }
+      currentAudioUrlRef.current = null;
+    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    setPlayingTTSId(null);
+  };
 
   // Load and pre-fetch modern Neural Natural voices
   useEffect(() => {
@@ -125,9 +151,7 @@ export default function CoalGPT() {
       window.speechSynthesis.onvoiceschanged = loadVoices;
     }
     return () => {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      stopCurrentAudio();
     };
   }, []);
 
@@ -234,60 +258,91 @@ export default function CoalGPT() {
     }
   };
 
-  const playTTS = (msgId, text) => {
+  const fallbackSpeechSynthesis = (msgId, cleanText) => {
     if (!('speechSynthesis' in window)) {
-      alert("Text-to-speech is not supported in this browser.");
+      setPlayingTTSId(null);
       return;
     }
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      const currentVoices = window.speechSynthesis.getVoices();
+      const candidateVoices = currentVoices.length > 0 ? currentVoices : availableVoices;
+      const bestVoice = getBestVoice(language, candidateVoices);
 
+      if (bestVoice) {
+        utterance.voice = bestVoice;
+        utterance.lang = bestVoice.lang;
+      } else {
+        utterance.lang = language === 'Hindi' ? 'hi-IN' : language === 'Bengali' ? 'bn-IN' : 'en-IN';
+      }
+
+      utterance.rate = 0.98;
+      utterance.pitch = 1.0;
+
+      utterance.onend = () => {
+        setPlayingTTSId(null);
+      };
+      utterance.onerror = () => {
+        setPlayingTTSId(null);
+      };
+
+      setPlayingTTSId(msgId);
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {
+      console.warn("Fallback speech synthesis error:", e);
+      setPlayingTTSId(null);
+    }
+  };
+
+  const playTTS = async (msgId, text) => {
     // Toggle: if currently speaking this message, stop immediately
     if (playingTTSId === msgId) {
-      window.speechSynthesis.cancel();
-      setPlayingTTSId(null);
+      stopCurrentAudio();
       return;
     }
 
     // Cancel any queued or active speech so it never loops or stacks
-    window.speechSynthesis.cancel();
+    stopCurrentAudio();
 
     // Strip markdown formatting characters for clean, natural speech
     const cleanText = (text || '')
       .replace(/#{1,6}\s*/g, '')
-      .replace(/\*\*/g, '')
-      .replace(/\*/g, '')
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
       .replace(/\[.*?\]/g, '')
+      .replace(/https?:\/\/\S+/g, '')
+      .replace(/[_`~]/g, '')
       .trim();
 
     if (!cleanText) return;
 
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-
-    // Bind human neural natural voice
-    const currentVoices = window.speechSynthesis.getVoices();
-    const candidateVoices = currentVoices.length > 0 ? currentVoices : availableVoices;
-    const bestVoice = getBestVoice(language, candidateVoices);
-
-    if (bestVoice) {
-      utterance.voice = bestVoice;
-      utterance.lang = bestVoice.lang;
-    } else {
-      utterance.lang = language === 'Hindi' ? 'hi-IN' : language === 'Bengali' ? 'bn-IN' : 'en-IN';
-    }
-
-    // Natural human cadence
-    utterance.rate = 0.98;
-    utterance.pitch = 1.0;
-
-    // Strictly play ONCE and clear state when finished
-    utterance.onend = () => {
-      setPlayingTTSId(null);
-    };
-    utterance.onerror = () => {
-      setPlayingTTSId(null);
-    };
-
     setPlayingTTSId(msgId);
-    window.speechSynthesis.speak(utterance);
+
+    try {
+      // Primary: Ultra-realistic Microsoft Azure Neural audio stream
+      const blob = await streamSpeechAudio(cleanText, language);
+      const audioUrl = URL.createObjectURL(blob);
+      currentAudioUrlRef.current = audioUrl;
+
+      const audio = new Audio(audioUrl);
+      currentAudioRef.current = audio;
+
+      // Strictly play ONCE and clear state when finished
+      audio.onended = () => {
+        stopCurrentAudio();
+      };
+      audio.onerror = (err) => {
+        console.warn("Audio playback error, falling back to Web Speech API", err);
+        stopCurrentAudio();
+        fallbackSpeechSynthesis(msgId, cleanText);
+      };
+
+      await audio.play();
+    } catch (err) {
+      console.warn("Neural audio streaming unavailable, falling back to Web Speech API", err);
+      fallbackSpeechSynthesis(msgId, cleanText);
+    }
   };
 
   // Persist active session messages and active session ID to localStorage

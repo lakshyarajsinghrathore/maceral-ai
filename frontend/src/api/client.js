@@ -83,6 +83,15 @@ export const fetchQAHistory = async () => {
   return response.data;
 };
 
+export const streamSpeechAudio = async (text, language = 'English') => {
+  const response = await api.post(
+    '/api/qa/speak',
+    { text, language },
+    { responseType: 'blob' }
+  );
+  return response.data;
+};
+
 // Ministry Reports API
 export const generateMinistryReport = async (reportData) => {
   const response = await api.post('/api/reports/generate', reportData);

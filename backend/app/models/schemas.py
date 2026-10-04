@@ -137,6 +137,10 @@ class QAResponse(BaseModel):
     chunks_analyzed: int
     context_found: bool
 
+class TTSRequest(BaseModel):
+    text: str
+    language: Optional[str] = "English"
+
 
 # Report Generation Schemas
 class InspectionCreate(BaseModel):
