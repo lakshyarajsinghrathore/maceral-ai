@@ -452,9 +452,6 @@ export default function ContractorsAudit() {
             <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
               Contractor Governance & Labor Grievance Portal
             </h2>
-            <span className="text-xs bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full border border-blue-200">
-              SIH 26024
-            </span>
           </div>
           <p className="text-sm text-gray-500 mt-1">
             Real-time third-party contractor compliance tracking, end-to-end worker grievance resolution lifecycle, and tamper-proof SHA-256 hash-chained audit trails.
@@ -700,9 +697,6 @@ export default function ContractorsAudit() {
                     Live Worker Grievances ({safeGrievances.length})
                   </h3>
                 </div>
-                <span className="text-[10px] font-mono bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-200">
-                  DGMS Monitored
-                </span>
               </div>
 
               <div className="p-4 space-y-3 overflow-y-auto max-h-[580px]">

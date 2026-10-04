@@ -158,10 +158,6 @@ export default function DocumentIntelligence() {
             <h2 className="text-2xl font-black text-gray-900 tracking-tight">
               AI Document Intelligence Engine
             </h2>
-            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-green-50 text-green-600 border border-green-200 flex items-center gap-1">
-              <Cpu className="w-3 h-3 text-green-600" />
-              OpenAI GPT-OSS 120B
-            </span>
           </div>
           <p className="text-sm text-gray-500 mt-1">
             Automated multi-format OCR, table extraction, and deep semantic mining parameter extraction powered by OpenAI GPT-OSS 120B.
@@ -310,9 +306,6 @@ export default function DocumentIntelligence() {
                           OCR Applied
                         </span>
                       )}
-                      <span className="px-2 py-0.5 rounded bg-green-50 text-green-600 text-[10px] font-mono border border-green-200">
-                        Extracted
-                      </span>
                       <button
                         type="button"
                         onClick={(e) => handleDeleteDocument(e, d)}
@@ -334,9 +327,8 @@ export default function DocumentIntelligence() {
             </div>
           </div>
 
-          <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-between text-[11px] text-gray-400 font-mono">
+          <div className="mt-3 pt-3 border-t border-gray-200 text-[11px] text-gray-400 font-mono">
             <span>RAG Chunks indexed with page-level lineage</span>
-            <span className="text-green-600">● Realtime Sync Active</span>
           </div>
         </div>
       </div>
@@ -349,9 +341,6 @@ export default function DocumentIntelligence() {
             <div>
               <div className="flex items-center space-x-2.5">
                 <h3 className="text-lg font-bold text-gray-900">{selectedDoc.title}</h3>
-                <span className="text-xs font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
-                  Confidence: {payload.confidence_score || 96.5}%
-                </span>
                 <button
                   type="button"
                   onClick={(e) => handleDeleteDocument(e, selectedDoc)}
@@ -568,9 +557,6 @@ export default function DocumentIntelligence() {
                       AI semantic clustering identifying core mining themes, geological grade parameters, and terminology across CMPDI/CIL document archives.
                     </p>
                   </div>
-                  <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-200">
-                    AI Clustering Active
-                  </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
