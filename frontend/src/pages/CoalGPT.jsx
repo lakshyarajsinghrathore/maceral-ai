@@ -107,8 +107,18 @@ export default function CoalGPT() {
   const [selectedMine, setSelectedMine] = useState('');
   const [language, setLanguage] = useState('English');
   const [isListening, setIsListening] = useState(false);
+  const [playingTTSId, setPlayingTTSId] = useState(null);
   const [mines, setMines] = useState([]);
   const messagesEndRef = useRef(null);
+
+  // Stop any active speech if user navigates away
+  useEffect(() => {
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   const toggleListening = () => {
     if (isListening) {
@@ -143,12 +153,45 @@ export default function CoalGPT() {
     }
   };
 
-  const playTTS = (text) => {
-    if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = language === 'Hindi' ? 'hi-IN' : language === 'Bengali' ? 'bn-IN' : 'en-IN';
-        window.speechSynthesis.speak(utterance);
+  const playTTS = (msgId, text) => {
+    if (!('speechSynthesis' in window)) {
+      alert("Text-to-speech is not supported in this browser.");
+      return;
     }
+
+    // Toggle: if currently speaking this message, stop immediately
+    if (playingTTSId === msgId) {
+      window.speechSynthesis.cancel();
+      setPlayingTTSId(null);
+      return;
+    }
+
+    // Cancel any queued or active speech so it never loops or stacks
+    window.speechSynthesis.cancel();
+
+    // Strip markdown formatting characters for clean, natural speech
+    const cleanText = (text || '')
+      .replace(/#{1,6}\s*/g, '')
+      .replace(/\*\*/g, '')
+      .replace(/\*/g, '')
+      .replace(/\[.*?\]/g, '')
+      .trim();
+
+    if (!cleanText) return;
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = language === 'Hindi' ? 'hi-IN' : language === 'Bengali' ? 'bn-IN' : 'en-IN';
+
+    // Strictly play ONCE and clear state when finished
+    utterance.onend = () => {
+      setPlayingTTSId(null);
+    };
+    utterance.onerror = () => {
+      setPlayingTTSId(null);
+    };
+
+    setPlayingTTSId(msgId);
+    window.speechSynthesis.speak(utterance);
   };
 
   // Persist active session messages and active session ID to localStorage
@@ -530,9 +573,14 @@ export default function CoalGPT() {
                         </div>
                         <span>CoalGPT AI Intelligence</span>
                         <button
-                          onClick={() => playTTS(m.content)}
-                          className="ml-2 text-gray-400 hover:text-blue-600 transition-colors"
-                          title="Read aloud"
+                          type="button"
+                          onClick={() => playTTS(m.id || 'welcome', m.content)}
+                          className={`ml-2 transition-colors ${
+                            playingTTSId === (m.id || 'welcome')
+                              ? 'text-blue-600 animate-pulse'
+                              : 'text-gray-400 hover:text-blue-600'
+                          }`}
+                          title={playingTTSId === (m.id || 'welcome') ? "Stop audio" : "Read aloud (once)"}
                         >
                           <Volume2 className="h-3.5 w-3.5" />
                         </button>

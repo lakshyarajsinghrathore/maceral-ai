@@ -160,7 +160,7 @@ export default function DocumentIntelligence() {
             </h2>
           </div>
           <p className="text-sm text-gray-500 mt-1">
-            Automated multi-format OCR, table extraction, and deep semantic mining parameter extraction powered by OpenAI GPT-OSS 120B.
+            Automated multi-format OCR, table extraction, and deep semantic mining parameter extraction.
           </p>
         </div>
       </div>
