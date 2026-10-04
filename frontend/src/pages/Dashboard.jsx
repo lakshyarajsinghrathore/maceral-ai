@@ -184,7 +184,7 @@ export default function Dashboard() {
               <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider mb-3">
                 Geospatial Mine Boundaries & Hazards
               </h3>
-              <div className="h-[400px] w-full rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
+              <div className="h-[560px] w-full">
                 <GISMap mines={mines} alerts={alerts} scores={mines} />
               </div>
             </div>

@@ -28,16 +28,16 @@ L.Icon.Default.mergeOptions({
 });
 
 // Helper component for smooth programmatic camera flying
-function MapFlyToController({ targetCoords, targetZoom }) {
+function MapFlyToController({ targetCoords, targetZoom, activeBaseLayer }) {
   const map = useMap();
 
   useEffect(() => {
-    // Invalidate size on mount to ensure Leaflet calculates accurate coordinates under any scale
+    // Invalidate size on mount and layer switch to ensure Leaflet calculates accurate coordinates and renders tiles immediately
     const timer = setTimeout(() => {
       map.invalidateSize();
-    }, 150);
+    }, 120);
     return () => clearTimeout(timer);
-  }, [map]);
+  }, [map, activeBaseLayer]);
 
   useEffect(() => {
     if (targetCoords && targetCoords.length === 2) {
@@ -204,7 +204,7 @@ export default function GISMap({ mines = [], scores = [], alerts = [] }) {
   return (
     <div className="w-full h-full flex flex-col rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm relative">
       {/* 1. Geospatial Command & Control Toolbar */}
-      <div className="p-3 bg-white/95 backdrop-blur-md border-b border-gray-200 z-20 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div className="shrink-0 p-3 bg-white/95 backdrop-blur-md border-b border-gray-200 z-30 flex flex-wrap items-center justify-between gap-3 text-xs relative">
         {/* Quick Fly-To Mine Selector */}
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 font-bold text-gray-700 uppercase tracking-wider text-[11px]">
@@ -259,14 +259,14 @@ export default function GISMap({ mines = [], scores = [], alerts = [] }) {
         </div>
 
         {/* Base Tile Layer Switcher */}
-        <div className="flex items-center bg-gray-100 p-0.5 rounded-lg border border-gray-200">
+        <div className="flex items-center bg-gray-100 p-0.5 rounded-lg border border-gray-200 shadow-inner">
           <button
             type="button"
             onClick={() => setActiveBaseLayer('satellite')}
-            className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
+            className={`px-3 py-1 rounded-md font-semibold text-xs transition-all ${
               activeBaseLayer === 'satellite' 
-                ? 'bg-blue-600 text-white shadow-sm' 
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-blue-600 text-white shadow-sm ring-1 ring-blue-700' 
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
             }`}
           >
             Satellite
@@ -274,10 +274,10 @@ export default function GISMap({ mines = [], scores = [], alerts = [] }) {
           <button
             type="button"
             onClick={() => setActiveBaseLayer('street')}
-            className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
+            className={`px-3 py-1 rounded-md font-semibold text-xs transition-all ${
               activeBaseLayer === 'street' 
-                ? 'bg-blue-600 text-white shadow-sm' 
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-blue-600 text-white shadow-sm ring-1 ring-blue-700' 
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
             }`}
           >
             Street
@@ -285,10 +285,10 @@ export default function GISMap({ mines = [], scores = [], alerts = [] }) {
           <button
             type="button"
             onClick={() => setActiveBaseLayer('dark')}
-            className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
+            className={`px-3 py-1 rounded-md font-semibold text-xs transition-all ${
               activeBaseLayer === 'dark' 
-                ? 'bg-gray-800 text-white shadow-sm' 
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-gray-900 text-white shadow-sm ring-1 ring-black' 
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
             }`}
           >
             Night Dark
@@ -297,15 +297,15 @@ export default function GISMap({ mines = [], scores = [], alerts = [] }) {
       </div>
 
       {/* 2. Interactive Leaflet Map Container */}
-      <div className="flex-1 relative w-full min-h-[460px]">
+      <div className="flex-1 relative w-full min-h-0">
         <MapContainer 
           center={INDIA_CENTER} 
           zoom={5} 
           scrollWheelZoom={true} 
-          className="w-full h-full min-h-[460px] z-10"
+          className="w-full h-full z-10"
         >
           {/* Programmatic Fly-To Controller */}
-          <MapFlyToController targetCoords={flyTarget.coords} targetZoom={flyTarget.zoom} />
+          <MapFlyToController targetCoords={flyTarget.coords} targetZoom={flyTarget.zoom} activeBaseLayer={activeBaseLayer} />
 
           {/* Active Dynamic Base Tile Layer */}
           <TileLayer
