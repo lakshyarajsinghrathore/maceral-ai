@@ -1,4 +1,4 @@
-const https = require('https');
+import https from 'node:https';
 
 function cleanText(text) {
   if (!text || typeof text !== 'string') return '';
@@ -58,7 +58,7 @@ function splitIntoChunks(text, maxLength = 180) {
   return chunks.length > 0 ? chunks : [text.slice(0, maxLength)];
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -102,4 +102,4 @@ module.exports = async (req, res) => {
     console.error('TTS handler error:', error);
     return res.status(500).json({ error: 'TTS generation failed', details: error.message });
   }
-};
+}
