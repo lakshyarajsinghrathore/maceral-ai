@@ -84,12 +84,28 @@ export const fetchQAHistory = async () => {
 };
 
 export const streamSpeechAudio = async (text, language = 'English') => {
-  const response = await api.post(
-    '/api/qa/speak',
-    { text, language },
-    { responseType: 'blob' }
-  );
-  return response.data;
+  try {
+    const response = await api.post(
+      '/api/qa/speak',
+      { text, language },
+      { responseType: 'blob' }
+    );
+    if (response.data && response.data.type && response.data.type.includes('html')) {
+      throw new Error('Received HTML instead of audio from primary backend');
+    }
+    return response.data;
+  } catch (err) {
+    console.warn('Primary backend TTS failed or updating, falling back to Vercel audio endpoint...', err);
+    const fallbackResponse = await axios.post(
+      '/api/speak',
+      { text, language },
+      { responseType: 'blob' }
+    );
+    if (fallbackResponse.data && fallbackResponse.data.type && fallbackResponse.data.type.includes('html')) {
+      throw new Error('Received HTML from /api/speak fallback');
+    }
+    return fallbackResponse.data;
+  }
 };
 
 // Ministry Reports API

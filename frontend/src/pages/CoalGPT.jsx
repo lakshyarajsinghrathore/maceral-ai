@@ -274,7 +274,13 @@ export default function CoalGPT() {
         utterance.voice = bestVoice;
         utterance.lang = bestVoice.lang;
       } else {
-        utterance.lang = language === 'Hindi' ? 'hi-IN' : language === 'Bengali' ? 'bn-IN' : 'en-IN';
+        const fallbackVoice = candidateVoices.find(v => v.lang.startsWith('hi') || v.lang.startsWith('en')) || candidateVoices[0];
+        if (fallbackVoice) {
+          utterance.voice = fallbackVoice;
+          utterance.lang = fallbackVoice.lang;
+        } else {
+          utterance.lang = 'en-IN';
+        }
       }
 
       utterance.rate = 0.98;
