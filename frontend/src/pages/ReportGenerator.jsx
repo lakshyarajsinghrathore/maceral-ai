@@ -17,26 +17,22 @@ const REPORT_TEMPLATES = [
   {
     type: 'Ministry_Monthly_Executive',
     title: 'Ministry Monthly Executive Briefing',
-    desc: 'Official high-level synthesis of gross production, OBR, railway siding dispatch, and revenue KPIs.',
-    badge: 'Ministry Standard'
+    desc: 'Official high-level synthesis of gross production, OBR, railway siding dispatch, and revenue KPIs.'
   },
   {
     type: 'Safety_Audit',
     title: 'DGMS & Mine Safety Compliance Dossier',
-    desc: 'Detailed log of gas levels (CH4/CO), ventilation status, reportable near-misses, and statutory notices.',
-    badge: 'DGMS Audit'
+    desc: 'Detailed log of gas levels (CH4/CO), ventilation status, reportable near-misses, and statutory notices.'
   },
   {
     type: 'Parliament_Query_Docket',
     title: 'Parliamentary Query Response Dossier',
-    desc: 'Official certified answers with source lineage and data citations for Lok Sabha / Rajya Sabha questions.',
-    badge: 'Parliamentary'
+    desc: 'Official certified answers with source lineage and data citations for Lok Sabha / Rajya Sabha questions.'
   },
   {
     type: 'Quarterly_Production',
     title: 'Quarterly Production & Stripping Summary',
-    desc: 'Deep-dive into geological seam quality, GCV grade breakdown, ash content, and dragline metrics.',
-    badge: 'Operations'
+    desc: 'Deep-dive into geological seam quality, GCV grade breakdown, ash content, and dragline metrics.'
   }
 ];
 
@@ -128,11 +124,8 @@ export default function ReportGenerator() {
                       : 'border-gray-200 bg-gray-50 hover:border-gray-300'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
+                  <div>
                     <h4 className="text-xs font-bold text-gray-900">{tpl.title}</h4>
-                    <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${isSelected ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-white text-gray-500 border-gray-200'}`}>
-                      {tpl.badge}
-                    </span>
                   </div>
                   <p className="text-[11px] text-gray-500 mt-1 leading-snug">{tpl.desc}</p>
                 </div>
@@ -143,8 +136,7 @@ export default function ReportGenerator() {
 
         {/* Configuration Form */}
         <div className="lg:col-span-2 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-blue-600" />
+          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">
             2. Report Parameters & Scope
           </h3>
 

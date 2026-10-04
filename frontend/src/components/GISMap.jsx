@@ -261,6 +261,7 @@ export default function GISMap({ mines = [], scores = [], alerts = [] }) {
         {/* Base Tile Layer Switcher */}
         <div className="flex items-center bg-gray-100 p-0.5 rounded-lg border border-gray-200">
           <button
+            type="button"
             onClick={() => setActiveBaseLayer('satellite')}
             className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
               activeBaseLayer === 'satellite' 
@@ -271,6 +272,7 @@ export default function GISMap({ mines = [], scores = [], alerts = [] }) {
             Satellite
           </button>
           <button
+            type="button"
             onClick={() => setActiveBaseLayer('street')}
             className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
               activeBaseLayer === 'street' 
@@ -281,6 +283,7 @@ export default function GISMap({ mines = [], scores = [], alerts = [] }) {
             Street
           </button>
           <button
+            type="button"
             onClick={() => setActiveBaseLayer('dark')}
             className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
               activeBaseLayer === 'dark' 
@@ -306,6 +309,7 @@ export default function GISMap({ mines = [], scores = [], alerts = [] }) {
 
           {/* Active Dynamic Base Tile Layer */}
           <TileLayer
+            key={activeBaseLayer}
             attribution={TILE_LAYERS[activeBaseLayer].attribution}
             url={TILE_LAYERS[activeBaseLayer].url}
             maxZoom={TILE_LAYERS[activeBaseLayer].maxZoom}

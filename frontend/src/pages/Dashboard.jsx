@@ -181,11 +181,8 @@ export default function Dashboard() {
           {/* Interactive Mine Sites Grid */}
           <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-5">
             <div>
-              <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider flex items-center justify-between mb-3">
-                <span>Geospatial Mine Boundaries & Hazards</span>
-                <span className="text-[10px] font-mono text-gray-500 bg-gray-50 px-2 py-0.5 rounded border border-gray-200">
-                  Live Telemetry
-                </span>
+              <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider mb-3">
+                Geospatial Mine Boundaries & Hazards
               </h3>
               <div className="h-[400px] w-full rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
                 <GISMap mines={mines} alerts={alerts} scores={mines} />

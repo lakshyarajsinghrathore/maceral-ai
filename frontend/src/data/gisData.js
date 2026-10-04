@@ -352,7 +352,7 @@ export const IOT_SENSORS = [
   }
 ];
 
-// Base Map Tile Providers (Free, Zero API Key)
+// Base Map Tile Providers (100% Free, Zero API Key Required, Global Esri CDN)
 export const TILE_LAYERS = {
   satellite: {
     name: 'Satellite View',
@@ -362,14 +362,14 @@ export const TILE_LAYERS = {
   },
   street: {
     name: 'Topographic Street',
-    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri &mdash; Sources: Esri, DeLorme, NAVTEQ, USGS, NRCAN, METI, TomTom',
     maxZoom: 19
   },
   dark: {
     name: 'Night Canvas (High Contrast)',
-    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    maxZoom: 19
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+    maxZoom: 16
   }
 };
